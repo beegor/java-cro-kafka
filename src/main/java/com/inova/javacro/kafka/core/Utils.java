@@ -1,4 +1,4 @@
-package com.inova.javacro.kafka;
+package com.inova.javacro.kafka.core;
 
 /**
  * Created by bigor on 04.04.16..

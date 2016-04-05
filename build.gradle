@@ -1,31 +1,80 @@
-group 'com.inova'
-version '1.0-SNAPSHOT'
-
-buildscript {
-    repositories {
-        mavenCentral()
-    }
+project.ext {
+    bareVersion = '1.1.0'
+    springVersion = '4.1.2.RELEASE'
+    springDataJpaVersion = '1.7.1.RELEASE'
+    buildDate = new Date().format('yyyyMMddHHmm')
 }
 
+group 'com.inova'
+
+
 apply plugin: 'java'
-apply plugin: 'war'
+apply plugin: 'spring-boot'
+
 
 sourceCompatibility = 1.8
 
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:1.2.3.RELEASE")
+    }
+}
+
+
 repositories {
     mavenCentral()
+    jcenter()
+}
+
+jar {
+    manifest {
+        attributes 'Implementation-Title': 'Javacro2016 Kafka', 'Implementation-Version': rootProject.bareVersion, 'Build-Date': rootProject.buildDate
+    }
 }
 
 dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.11'
 
-    compile (
-        ['org.apache.kafka:kafka_2.11:0.9.0.1'],
-//        ['ch.qos.logback:logback-core:1.+'],
-//        ['ch.qos.logback:logback-classic:1.+'],
-//        ['org.slf4j:log4j-over-slf4j:1.+'],
-//        ['org.slf4j:jcl-over-slf4j:1.+'],
-//        ['org.slf4j:jul-to-slf4j:1.+'],
-//        ['commons-logging:commons-logging:1.2']
+    compile(
+            ['org.apache.kafka:kafka_2.11:0.9.0.1'],
+
+            ["org.springframework.boot:spring-boot-starter-web"],
+            ["org.springframework.boot:spring-boot-starter-tomcat"],
+//            ["org.springframework.boot:spring-boot-starter-data-jpa"],
+//            ["org.springframework.boot:spring-boot-starter-logging"],
+
+            ["org.springframework:spring-aspects:${springVersion}"],
+            ["org.springframework:spring-core:${springVersion}"],
+            ["org.springframework:spring-tx:${springVersion}"],
+            ["org.springframework:spring-beans:${springVersion}"],
+            ["org.springframework:spring-context:${springVersion}"],
+            ["org.springframework:spring-context-support:${springVersion}"],
+            ["org.springframework:spring-expression:${springVersion}"],
+//            ["org.springframework:spring-orm:${springVersion}"],
+//            ["org.springframework:spring-jdbc:${springVersion}"],
+            ["org.springframework:spring-aop:${springVersion}"],
+
+            ['org.springframework.boot:spring-boot-starter-thymeleaf'],
+
+//            ["org.springframework.data:spring-data-jpa:${springDataJpaVersion}"],
+
+            ['org.codehaus.janino:janino:2.6.1'],
+            ['ch.qos.logback:logback-core:1.+'],
+            ['ch.qos.logback:logback-classic:1.+'],
+            ['org.slf4j:log4j-over-slf4j:1.+'],
+            ['org.slf4j:jcl-over-slf4j:1.+'],
+            ['org.slf4j:jul-to-slf4j:1.+'],
     )
+
+    testCompile("org.springframework.boot:spring-boot-starter-test")
+}
+
+
+configurations {
+    all*.exclude group: 'commons-logging', module: 'commons-logging'
+    all*.exclude group: "log4j", module: "log4j"
+    all*.exclude group: "org.slf4j", module: "slf4j-log4j12"
 }

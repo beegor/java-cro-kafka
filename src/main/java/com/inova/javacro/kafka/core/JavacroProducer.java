@@ -1,4 +1,4 @@
-package com.inova.javacro.kafka;
+package com.inova.javacro.kafka.core;
 
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerConfig;
@@ -9,7 +9,6 @@ import org.apache.kafka.common.serialization.StringSerializer;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Properties;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 public class JavacroProducer implements Runnable{
@@ -42,13 +41,13 @@ public class JavacroProducer implements Runnable{
             Future<RecordMetadata> result = producer.send(new ProducerRecord("test", null, msg));
             try {
                 RecordMetadata metadata = result.get();
-            } catch (InterruptedException e) {
+                System.out.println("Sent msg: \"" + msg + "\"");
+            } catch (Exception e) {
                 e.printStackTrace();
-            } catch (ExecutionException e) {
-                e.printStackTrace();
+                System.out.println("Msg failed: \"" + msg + "\"");
             }
             Utils.sleep(300);
-            System.out.println("Sent msg: \"" + msg + "\"");
+
         }
     }
 
