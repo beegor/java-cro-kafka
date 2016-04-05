@@ -1,0 +1,31 @@
+group 'com.inova'
+version '1.0-SNAPSHOT'
+
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+}
+
+apply plugin: 'java'
+apply plugin: 'war'
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testCompile group: 'junit', name: 'junit', version: '4.11'
+
+    compile (
+        ['org.apache.kafka:kafka_2.11:0.9.0.1'],
+//        ['ch.qos.logback:logback-core:1.+'],
+//        ['ch.qos.logback:logback-classic:1.+'],
+//        ['org.slf4j:log4j-over-slf4j:1.+'],
+//        ['org.slf4j:jcl-over-slf4j:1.+'],
+//        ['org.slf4j:jul-to-slf4j:1.+'],
+//        ['commons-logging:commons-logging:1.2']
+    )
+}
