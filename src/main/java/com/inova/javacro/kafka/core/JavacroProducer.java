@@ -11,48 +11,57 @@ import java.time.format.DateTimeFormatter;
 import java.util.Properties;
 import java.util.concurrent.Future;
 
-public class JavacroProducer implements Runnable{
+public class JavacroProducer {
 
     private Properties config = new Properties();
     private static int msgNo = 1;
     private KafkaProducer producer;
 
+    private boolean active = false;
 
+    private DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd.MM.yyyy  HH:mm:SSS");
 
-    public JavacroProducer() {
+    public JavacroProducer(String topic) {
+
         config.put("client.id", "localhost");
         config.put("bootstrap.servers", "localhost:9092");
         config.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
         config.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
         config.put("acks", "1");
         producer = new KafkaProducer<String, String>(config);
-        new Thread(this).start();
+
+
+        new Thread(() -> {
+
+            active = true;
+
+            while (active) {
+                sendMessage();
+                Utils.sleep(300);
+            }
+
+        }).start();
     }
 
 
-    private DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd.MM.yyyy  HH:mm:SSS");
-
-    @Override
-    public void run() {
-
-        while (true) {
-
-            String msg = "Poruka  " + (msgNo++) + "  produced at " + LocalDateTime.now().format(dtf) ;
-            Future<RecordMetadata> result = producer.send(new ProducerRecord("test", null, msg));
-            try {
-                RecordMetadata metadata = result.get();
-                System.out.println("Sent msg: \"" + msg + "\"");
-            } catch (Exception e) {
-                e.printStackTrace();
-                System.out.println("Msg failed: \"" + msg + "\"");
-            }
-            Utils.sleep(300);
-
+    private void sendMessage() {
+        String msg = "Poruka  " + (msgNo++) + "  produced at " + LocalDateTime.now().format(dtf);
+        Future<RecordMetadata> result = producer.send(new ProducerRecord("test", null, msg));
+        try {
+            RecordMetadata metadata = result.get();
+            System.out.println("Sent msg: \"" + msg + "\"");
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("Msg failed: \"" + msg + "\"");
         }
     }
 
 
     public static void main(String[] args) {
-        new JavacroProducer();
+        new JavacroProducer("test");
+    }
+
+    public void stop() {
+        active = false;
     }
 }

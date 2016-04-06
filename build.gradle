@@ -7,7 +7,6 @@ project.ext {
 
 group 'com.inova'
 
-
 apply plugin: 'java'
 apply plugin: 'spring-boot'
 
@@ -43,8 +42,7 @@ dependencies {
 
             ["org.springframework.boot:spring-boot-starter-web"],
             ["org.springframework.boot:spring-boot-starter-tomcat"],
-//            ["org.springframework.boot:spring-boot-starter-data-jpa"],
-//            ["org.springframework.boot:spring-boot-starter-logging"],
+            ["org.springframework.boot:spring-boot-starter-logging"],
 
             ["org.springframework:spring-aspects:${springVersion}"],
             ["org.springframework:spring-core:${springVersion}"],
@@ -53,13 +51,9 @@ dependencies {
             ["org.springframework:spring-context:${springVersion}"],
             ["org.springframework:spring-context-support:${springVersion}"],
             ["org.springframework:spring-expression:${springVersion}"],
-//            ["org.springframework:spring-orm:${springVersion}"],
-//            ["org.springframework:spring-jdbc:${springVersion}"],
             ["org.springframework:spring-aop:${springVersion}"],
 
             ['org.springframework.boot:spring-boot-starter-thymeleaf'],
-
-//            ["org.springframework.data:spring-data-jpa:${springDataJpaVersion}"],
 
             ['org.codehaus.janino:janino:2.6.1'],
             ['ch.qos.logback:logback-core:1.+'],
