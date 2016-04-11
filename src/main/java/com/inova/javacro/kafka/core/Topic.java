@@ -13,4 +13,16 @@ public class Topic {
         this.topicValue = topicValue;
         this.topicColorHex = topicColorHex;
     }
+
+    public int getPartitionCount() {
+        return partitionCount;
+    }
+
+    public String getTopicValue() {
+        return topicValue;
+    }
+
+    public String getTopicColorHex() {
+        return topicColorHex;
+    }
 }
