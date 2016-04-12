@@ -2,6 +2,7 @@ package com.inova.javacro.kafka.service;
 
 import kafka.admin.AdminUtils;
 import kafka.api.TopicMetadata;
+import kafka.common.TopicAlreadyMarkedForDeletionException;
 import kafka.utils.ZkUtils;
 import org.I0Itec.zkclient.ZkClient;
 import org.I0Itec.zkclient.ZkConnection;
@@ -12,6 +13,7 @@ import com.inova.javacro.kafka.core.Topic;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Properties;
 
 @Service
@@ -51,12 +53,33 @@ public class TopicManagerImpl implements TopicManager {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
     }
+
+    @Override
+    public void deleteTopic(String topicName) {
+
+        try {
+            try {
+                AdminUtils.deleteTopic(zkUtils, topicName);
+            } catch (TopicAlreadyMarkedForDeletionException te) {
+                // ok, its already deleted from kafka
+            }
+            topics.removeIf(t -> t.getTopicName().equals(topicName));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
 
     @Override
     public List<Topic> getTopics() {
         return topics;
+    }
+
+    @Override
+    public Topic getTopic(String topicName) {
+        Optional<Topic> topic = topics.stream().filter(t -> t.getTopicName().equals(topicName)).findFirst();
+        return topic.isPresent() ? topic.get() : null;
     }
 
 

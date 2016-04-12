@@ -4,13 +4,13 @@ public class Topic {
 
     private int partitionCount;
 
-    private String topicValue;
+    private String topicName;
 
     private String topicColorHex;
 
-    public Topic(int partitionCount, String topicValue, String topicColorHex) {
+    public Topic(int partitionCount, String topicName, String topicColorHex) {
         this.partitionCount = partitionCount;
-        this.topicValue = topicValue;
+        this.topicName = topicName;
         this.topicColorHex = topicColorHex;
     }
 
@@ -18,8 +18,8 @@ public class Topic {
         return partitionCount;
     }
 
-    public String getTopicValue() {
-        return topicValue;
+    public String getTopicName() {
+        return topicName;
     }
 
     public String getTopicColorHex() {

@@ -11,5 +11,9 @@ public interface TopicManager {
 
     void addTopic(String topicValue, int partitionCount);
 
+    void deleteTopic(String topicValue);
+
     List<Topic> getTopics();
+
+    Topic getTopic(String topicName);
 }

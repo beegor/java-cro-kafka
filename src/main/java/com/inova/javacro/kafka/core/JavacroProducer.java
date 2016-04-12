@@ -17,12 +17,14 @@ public class JavacroProducer {
     private static int msgNo = 1;
     private KafkaProducer producer;
 
+    private Topic topic;
+
     private boolean active = false;
 
     private DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd.MM.yyyy  HH:mm:SSS");
 
-    public JavacroProducer(String topic) {
-
+    public JavacroProducer(Topic topic) {
+        this.topic = topic;
         config.put("client.id", "localhost");
         config.put("bootstrap.servers", "localhost:9092");
         config.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
@@ -46,7 +48,7 @@ public class JavacroProducer {
 
     private void sendMessage() {
         String msg = "Poruka  " + (msgNo++) + "  produced at " + LocalDateTime.now().format(dtf);
-        Future<RecordMetadata> result = producer.send(new ProducerRecord("test", null, msg));
+        Future<RecordMetadata> result = producer.send(new ProducerRecord(topic.getTopicName(), null, msg));
         try {
             RecordMetadata metadata = result.get();
             System.out.println("Sent msg: \"" + msg + "\"");
@@ -57,11 +59,12 @@ public class JavacroProducer {
     }
 
 
-    public static void main(String[] args) {
-        new JavacroProducer("test");
-    }
-
     public void stop() {
         active = false;
+    }
+
+
+    public Topic getTopic() {
+        return topic;
     }
 }
