@@ -7,7 +7,8 @@
     <div th:fragment="consumer(consumerId, consumer)" class="consumer" th:style="|border-color: ${consumer.topic.topicColorHex}|">
         <button class="delete-consumer pull-right" th:attr="data-consumer-id=${consumerId}">X</button>
         <h2 th:text="|Consumer|"></h2>
-        <h6 th:text="${consumerId}"></h6>
+        <h6 th:text="|Id: ${consumerId}|"></h6>
+        <h6 th:text="|Group: ${consumer.group}|"></h6>
     </div>
 
 

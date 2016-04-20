@@ -11,7 +11,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.Properties;
 import java.util.concurrent.Future;
 
-public class JavacroProducer {
+public class JavaCroProducer {
 
     private Properties config = new Properties();
     private static int msgNo = 1;
@@ -23,15 +23,14 @@ public class JavacroProducer {
 
     private DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd.MM.yyyy  HH:mm:SSS");
 
-    public JavacroProducer(Topic topic) {
+    public JavaCroProducer(String id, Topic topic) {
         this.topic = topic;
-        config.put("client.id", "localhost");
+        config.put("client.id", id);
         config.put("bootstrap.servers", "localhost:9092");
         config.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
         config.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
         config.put("acks", "1");
         producer = new KafkaProducer<String, String>(config);
-
 
         new Thread(() -> {
             active = true;

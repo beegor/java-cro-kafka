@@ -1,6 +1,6 @@
 package com.inova.javacro.kafka.service;
 
-import com.inova.javacro.kafka.core.JavacroProducer;
+import com.inova.javacro.kafka.core.JavaCroProducer;
 import com.inova.javacro.kafka.core.Topic;
 
 import java.util.Map;
@@ -11,5 +11,5 @@ public interface ProducersManager {
 
     void destroyProducer(String producerId);
 
-    Map<String, JavacroProducer> getProducers();
+    Map<String, JavaCroProducer> getProducers();
 }
