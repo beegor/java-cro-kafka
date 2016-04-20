@@ -1,4 +1,4 @@
-body {
+body{
     background-color: #d4d4d4;
 }
 
@@ -12,7 +12,7 @@ body {
     background-color: white;
 }
 
-.titlebar {
+.titlebar{
     padding: 5px;
     background-color: black;
     color: white;

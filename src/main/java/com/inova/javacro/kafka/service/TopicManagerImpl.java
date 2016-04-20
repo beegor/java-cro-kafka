@@ -33,7 +33,10 @@ public class TopicManagerImpl implements TopicManager {
 
         int connectionTimeoutMs = 8 * 1000;
 
-        ZkClient zkClient = new ZkClient(zkConnection, connectionTimeoutMs, ZKStringSerializer$.MODULE$);
+        ZkClient zkClient = new ZkClient(
+                zkConnection,
+                connectionTimeoutMs,
+                ZKStringSerializer$.MODULE$);
 
         zkUtils = new ZkUtils(zkClient, zkConnection, false);
 

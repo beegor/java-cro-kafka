@@ -18,10 +18,9 @@ public class JavaCroConsumer implements Runnable {
     private final KafkaConsumer<String, String> consumer;
     private final AtomicBoolean shutdown;
     private final CountDownLatch shutdownLatch;
-
     private final String group;
-
     private final Topic topic;
+
 
 
     public JavaCroConsumer(String id, Topic topic, String group) {
@@ -48,6 +47,9 @@ public class JavaCroConsumer implements Runnable {
     }
 
 
+
+
+
     @Override
     public void run() {
 
@@ -63,11 +65,12 @@ public class JavaCroConsumer implements Runnable {
     }
 
 
+
     private void process(ConsumerRecord<String, String> record) {
         System.out.println(record.value());
     }
 
-    public void stop() {
+    public void stop(){
         shutdown.set(true);
     }
 
