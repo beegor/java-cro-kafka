@@ -16,21 +16,31 @@ public class JavaCroConsumer implements Runnable {
 
 
     private final KafkaConsumer<String, String> consumer;
-    private final List<String> topics = new ArrayList<>();
     private final AtomicBoolean shutdown;
     private final CountDownLatch shutdownLatch;
 
-    public JavaCroConsumer() {
+    private final String group;
 
+    private final Topic topic;
+
+
+    public JavaCroConsumer(String id, Topic topic, String group) {
+
+        this.topic = topic;
+        this.group = group;
         Properties config = new Properties();
-        config.put("client.id", "localhost");
-        config.put("group.id", "foo");
+        config.put("client.id", id);
+        config.put("group.id", group);
         config.put("bootstrap.servers", "localhost:9092");
         config.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
         config.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
 
-        topics.add("test");
         consumer = new KafkaConsumer(config);
+
+        List<String> topics = new ArrayList<>();
+        topics.add(topic.getTopicName());
+        consumer.subscribe(topics);
+
         this.shutdown = new AtomicBoolean(false);
         this.shutdownLatch = new CountDownLatch(1);
 
@@ -42,7 +52,6 @@ public class JavaCroConsumer implements Runnable {
     public void run() {
 
         try {
-            consumer.subscribe(topics);
             while (!shutdown.get()) {
                 ConsumerRecords<String, String> records = consumer.poll(500);
                 records.forEach(record -> process(record));
@@ -53,15 +62,20 @@ public class JavaCroConsumer implements Runnable {
         }
     }
 
+
     private void process(ConsumerRecord<String, String> record) {
         System.out.println(record.value());
     }
 
-
-
-    public static void main(String[] args) {
-        new JavaCroConsumer();
+    public void stop() {
+        shutdown.set(true);
     }
 
+    public Topic getTopic() {
+        return topic;
+    }
 
+    public String getGroup() {
+        return group;
+    }
 }

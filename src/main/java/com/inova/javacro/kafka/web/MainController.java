@@ -5,6 +5,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import com.inova.javacro.kafka.service.ConsumersManager;
 import com.inova.javacro.kafka.service.ProducersManager;
 import com.inova.javacro.kafka.service.TopicManager;
 
@@ -20,9 +21,20 @@ public class MainController {
     @Autowired
     private ProducersManager producersManager;
 
+    @Autowired
+    private ConsumersManager consumersManager;
+
 
     @RequestMapping("/")
     public String showMainPage(Model model) {
+        model.addAttribute("topics", topicManager.getTopics());
+        model.addAttribute("producers", producersManager.getProducers());
+        model.addAttribute("consumers", consumersManager.getConsumers());
+        return "main";
+    }
+
+    @RequestMapping("/state")
+    public String getState(Model model) {
         model.addAttribute("topics", topicManager.getTopics());
         model.addAttribute("producers", producersManager.getProducers());
         return "main";

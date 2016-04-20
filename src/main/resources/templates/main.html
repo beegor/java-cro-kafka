@@ -8,7 +8,7 @@
     <link rel="stylesheet" th:href="@{/bootstrap-3.3.6/css/bootstrap-theme.min.css}"/>
     <link rel="stylesheet" th:href="@{/style.css}"/>
 
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+    <script th:src="@{/jquery-1.12.3.min.js}"></script>
 
 
 </head>
@@ -19,47 +19,66 @@
 
 <!--/*@thymesVar id="topics" type="java.util.List<com.inova.javacro.kafka.core.Topic>"*/-->
 <!--/*@thymesVar id="producers" type="java.util.Map<java.lang.String, com.inova.javacro.kafka.core.JavacroProducer>"*/-->
+<!--/*@thymesVar id="consumers" type="java.util.Map<java.lang.String, com.inova.javacro.kafka.core.JavaCroConsumer>"*/-->
 
-<div class="container" style="border: solid 1px #101010">
+<div class="container-fluid">
     <div class="row">
         <div class="col-xs-4">
-            <div>PRODUCERS</div>
+            <div class="box">
 
-            <div class="pull-right">
-                <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#addProducerModal">
-                    Add consumer
-                </button>
-            </div>
-
-            <div th:each="entry : ${producers.entrySet()}" class="topic" th:style="|border-color: ${entry.value.topic.getTopicColorHex()}|">
-                <button class="delete-topic pull-right" th:attr="data-producer-id=${entry.key}">X</button>
-                <h2 th:text="|Producer ${entry.key}|"></h2>
-            </div>
-
-        </div>
-
-        <div class="col-xs-4">
-            <div>
-                KAFKA
-                <div class="pull-right">
-                    <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#addTopicModal">
-                        Add topic
+                <div class="titlebar">
+                    <button type="button" class="btn btn-primary btn-sm pull-right" data-toggle="modal" data-target="#addProducerModal">
+                        Add producer
                     </button>
+                    <h1>PRODUCERS</h1>
+                    <div class="clearboth"></div>
+                </div>
+
+
+                <div th:each="entry : ${producers.entrySet()}">
+                    <div th:replace="fragments/producer :: producer(${entry.key}, ${entry.value})"></div>
                 </div>
             </div>
 
+        </div>
 
-            <div th:each="topic : ${topics}" class="topic" th:style="|border-color: ${topic.getTopicColorHex()}|">
-                <button class="delete-topic pull-right" th:attr="data-topic-name=${topic.getTopicName()}">X</button>
-                <h2 th:text="${topic.getTopicName()}"></h2>
-                <!--<p> partitions: <span th:text="${topic.getPartitionCount()}"></span></p>-->
-                <div th:each="i : ${#numbers.sequence(1,topic.partitionCount)}" class="partition"></div>
+        <div class="col-xs-4">
+            <div class="box">
+
+
+                <div class="titlebar">
+                    <button type="button" class="btn btn-primary btn-sm pull-right" data-toggle="modal" data-target="#addTopicModal">
+                        Add topic
+                    </button>
+                    <h1>KAFKA</h1>
+                    <div class="clearboth"></div>
+                </div>
+
+
+                <div th:each="topic : ${topics}">
+                    <div th:replace="fragments/topic :: topic(${topic})"></div>
+                </div>
+
             </div>
 
         </div>
 
         <div class="col-xs-4">
-            <div>CONSUMERS</div>
+            <div class="box">
+
+                <div class="titlebar">
+                    <button type="button" class="btn btn-primary btn-sm pull-right" data-toggle="modal" data-target="#addConsumerModal">
+                        Add consumer
+                    </button>
+                    <h1>CONSUMERS</h1>
+                    <div class="clearboth"></div>
+                </div>
+
+                <div th:each="entry : ${consumers.entrySet()}">
+                    <div th:replace="fragments/consumer :: consumer(${entry.key}, ${entry.value})"></div>
+                </div>
+
+            </div>
 
 
         </div>
@@ -87,7 +106,7 @@
                     <div class="form-group">
                         <label for="partitionCount" class="col-sm-2 control-label">Partition count</label>
                         <div class="col-sm-10">
-                            <input type="number" class="form-control" name="partitionCount" id="partitionCount" placeholder="1"/>
+                            <input type="number" class="form-control" name="partitionCount" id="partitionCount" value="1"/>
                         </div>
                     </div>
 
@@ -108,7 +127,7 @@
             <form th:action="@{/producer/add}" class="form-horizontal" id="add-producer-form">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                    <h4 class="modal-title">Create topic</h4>
+                    <h4 class="modal-title">Create producer</h4>
                 </div>
                 <div class="modal-body">
 
@@ -116,7 +135,7 @@
                         <label for="producerTopic" class="col-sm-2 control-label">Topic</label>
                         <div class="col-sm-10">
                             <select name="topicName" class="form-control" id="producerTopic">
-                                <option th:each="topic : ${topics}" th:value="${topic.topicName}"/>
+                                <option th:each="topic : ${topics}" th:value="${topic.topicName}" th:text="${topic.topicName}"></option>
                             </select>
                         </div>
                     </div>
@@ -131,6 +150,42 @@
     </div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
 
+
+<div id="addConsumerModal" class="modal fade" tabindex="-1" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form th:action="@{/consumer/add}" class="form-horizontal" id="add-consumer-form">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">Create consumer</h4>
+                </div>
+                <div class="modal-body">
+
+                    <div class="form-group">
+                        <label for="consumerTopic" class="col-sm-2 control-label">Topic</label>
+                        <div class="col-sm-10">
+                            <select name="topicName" class="form-control" id="consumerTopic">
+                                <option th:each="topic : ${topics}" th:value="${topic.topicName}" th:text="${topic.topicName}"></option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">Topic</label>
+                        <div class="col-sm-10">
+                            <input type="text" name="group" placeholder="group name"/>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Create</button>
+                </div>
+            </form>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
 
 <script th:inline="javascript">
 
@@ -166,10 +221,29 @@
         e.preventDefault(); // avoid to execute the actual submit of the form.
     });
 
+    $("#add-consumer-form").submit(function (e) {
+
+        var url = $(this).attr("action");
+
+        $.ajax({
+            type: "POST",
+            url: url,
+            data: $(this).serialize(), // serializes the form's elements.
+            success: function (data) {
+                location.reload();
+            }
+        });
+
+        e.preventDefault(); // avoid to execute the actual submit of the form.
+    });
+
     $(".delete-topic").on("click", function (ev) {
 
-        var url = [[@{/topic/delete
-    }]]
+        var url = [[@{
+            /topic/
+            delete
+        }
+        ]]
         ;
         var topicName = $(this).attr("data-topic-name");
 
@@ -188,8 +262,11 @@
 
     $(".delete-producer").on("click", function (ev) {
 
-        var url = [[@{/producer/delete
-    }]]
+        var url = [[@{
+            /producer/
+            delete
+        }
+        ]]
         ;
         var producerId = $(this).attr("data-producer-id");
 
@@ -197,6 +274,26 @@
             type: "POST",
             url: url,
             data: "producerId=" + producerId, // serializes the form's elements.
+            success: function (data) {
+                location.reload();
+            }
+        });
+
+        ev.preventDefault();
+
+    });
+
+    $(".delete-consumer").on("click", function (ev) {
+
+        var url = [[@{/consumer/delete
+    }]]
+        ;
+        var consumerId = $(this).attr("data-consumer-id");
+
+        $.ajax({
+            type: "POST",
+            url: url,
+            data: "consumerId=" + consumerId, // serializes the form's elements.
             success: function (data) {
                 location.reload();
             }

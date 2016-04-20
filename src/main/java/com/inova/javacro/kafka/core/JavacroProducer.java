@@ -34,28 +34,28 @@ public class JavacroProducer {
 
 
         new Thread(() -> {
-
             active = true;
-
             while (active) {
                 sendMessage();
                 Utils.sleep(300);
             }
-
         }).start();
     }
 
 
     private void sendMessage() {
-        String msg = "Poruka  " + (msgNo++) + "  produced at " + LocalDateTime.now().format(dtf);
-        Future<RecordMetadata> result = producer.send(new ProducerRecord(topic.getTopicName(), null, msg));
-        try {
-            RecordMetadata metadata = result.get();
-            System.out.println("Sent msg: \"" + msg + "\"");
-        } catch (Exception e) {
-            e.printStackTrace();
-            System.out.println("Msg failed: \"" + msg + "\"");
-        }
+        new Thread(() -> {
+            String msg = "Poruka  " + LocalDateTime.now().format(dtf);
+            Future<RecordMetadata> result = producer.send(new ProducerRecord(topic.getTopicName(), null, msg));
+            try {
+                RecordMetadata metadata = result.get();
+                System.out.println("Sent msg: \"" + msg + "\"");
+            } catch (Exception e) {
+                e.printStackTrace();
+                System.out.println("Msg failed: \"" + msg + "\"");
+            }
+        }).start();
+
     }
 
 

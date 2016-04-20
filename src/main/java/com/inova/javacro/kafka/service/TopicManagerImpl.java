@@ -3,6 +3,7 @@ package com.inova.javacro.kafka.service;
 import kafka.admin.AdminUtils;
 import kafka.api.TopicMetadata;
 import kafka.common.TopicAlreadyMarkedForDeletionException;
+import kafka.utils.ZKStringSerializer$;
 import kafka.utils.ZkUtils;
 import org.I0Itec.zkclient.ZkClient;
 import org.I0Itec.zkclient.ZkConnection;
@@ -29,7 +30,11 @@ public class TopicManagerImpl implements TopicManager {
 
     public TopicManagerImpl() {
         ZkConnection zkConnection = new ZkConnection("localhost:2181");
-        ZkClient zkClient = new ZkClient(zkConnection);
+
+        int connectionTimeoutMs = 8 * 1000;
+
+        ZkClient zkClient = new ZkClient(zkConnection, connectionTimeoutMs, ZKStringSerializer$.MODULE$);
+
         zkUtils = new ZkUtils(zkClient, zkConnection, false);
 
         Map<String, Properties> map = AdminUtils.fetchAllTopicConfigs(zkUtils);
@@ -47,6 +52,7 @@ public class TopicManagerImpl implements TopicManager {
     public void addTopic(String topicValue, int partitionCount) {
 
         try {
+
             Topic topic = new Topic(partitionCount, topicValue, colorPicker.getNextColor());
             AdminUtils.createTopic(zkUtils, topicValue, partitionCount, 1, new Properties());
             topics.add(topic);

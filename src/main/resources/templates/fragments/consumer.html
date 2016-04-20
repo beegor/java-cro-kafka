@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<body>
+
+
+<!--/*@thymesVar id="consumer" type="com.inova.javacro.kafka.core.JavaCroConsumer"*/-->
+<div th:fragment="consumer(consumerId, consumer)" class="consumer" th:style="|border-color: ${consumer.topic.topicColorHex}|">
+    <button class="delete-consumer pull-right" th:attr="data-consumer-id=${consumerId}">X</button>
+    <h2 th:text="|Consumer|"></h2>
+    <h6 th:text="${consumerId}"></h6>
+</div>
+
+
+</body>
+</html>

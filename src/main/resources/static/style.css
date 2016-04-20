@@ -1,6 +1,33 @@
+body {
+    background-color: #d4d4d4;
+}
+
+.clearboth {
+    clear: both;
+}
+
+.box {
+    border: solid 10px #0f0f0f;
+    border-radius: 5px;
+    background-color: white;
+}
+
+.titlebar {
+    padding: 5px;
+    background-color: black;
+    color: white;
+}
+
+.titlebar h1 {
+    margin: 0px !important;
+    font-size: 20px;
+    font-weight: bold;
+}
+
 .topic {
     border: solid 25px;
-    margin: 10px;
+    border-radius: 10px;
+    margin: 30px;
     padding: 5px;
 }
 
@@ -13,4 +40,16 @@
     height: 15px;
     background-color: #919191;
     margin-top: 10px;
+}
+
+.producer, .consumer {
+    border: solid 25px;
+    border-radius: 20px;
+    margin: 20px;
+    padding: 5px;
+}
+
+.producer h2, .consumer h2 {
+    margin: 5px 0px !important;
+    font-weight: bold !important;
 }
