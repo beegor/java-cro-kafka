@@ -21,12 +21,16 @@ public class JavaCroConsumer implements Runnable {
     private final String group;
     private final Topic topic;
 
+    private long lastFetchSecond = 0;
+    private int speedMsgPerSec = 0;
+
 
 
     public JavaCroConsumer(String id, Topic topic, String group) {
 
         this.topic = topic;
         this.group = group;
+
         Properties config = new Properties();
         config.put("client.id", id);
         config.put("group.id", group);
@@ -47,15 +51,14 @@ public class JavaCroConsumer implements Runnable {
     }
 
 
-
-
-
     @Override
     public void run() {
 
         try {
+
             while (!shutdown.get()) {
-                ConsumerRecords<String, String> records = consumer.poll(500);
+                ConsumerRecords<String, String> records = consumer.poll(1000);
+                updateSpeed(records.count());
                 records.forEach(record -> process(record));
             }
         } finally {
@@ -64,11 +67,20 @@ public class JavaCroConsumer implements Runnable {
         }
     }
 
-
-
     private void process(ConsumerRecord<String, String> record) {
         System.out.println(record.value());
     }
+
+
+
+    private void updateSpeed(int recordsCount) {
+        long currentSecond = System.currentTimeMillis() / 1000;
+        if (lastFetchSecond == currentSecond)
+            speedMsgPerSec += recordsCount;
+        else speedMsgPerSec = recordsCount;
+        lastFetchSecond = currentSecond;
+    }
+
 
     public void stop(){
         shutdown.set(true);
@@ -80,5 +92,9 @@ public class JavaCroConsumer implements Runnable {
 
     public String getGroup() {
         return group;
+    }
+
+    public int getSpeedMsgPerSec() {
+        return speedMsgPerSec;
     }
 }

@@ -19,6 +19,8 @@ public class JavaCroProducer {
 
     private Topic topic;
 
+    private long lastSendTime = 0;
+    private int speedMsgPerSec = (int) (1 + Math.random() * 10);
     private boolean active = false;
 
     private DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd.MM.yyyy  HH:mm:SSS");
@@ -35,8 +37,16 @@ public class JavaCroProducer {
         new Thread(() -> {
             active = true;
             while (active) {
-                sendMessage();
-                Utils.sleep(300);
+
+                if (speedMsgPerSec > 0) {
+                    long nextMsgTime = lastSendTime + 1000 / speedMsgPerSec;
+                    long now = System.currentTimeMillis();
+                    if (nextMsgTime < now) {
+                        sendMessage();
+                        lastSendTime = now;
+                    }
+                }
+                Utils.sleep(10);
             }
         }).start();
     }
@@ -51,7 +61,6 @@ public class JavaCroProducer {
                 System.out.println("Sent msg: \"" + msg + "\"");
             } catch (Exception e) {
                 e.printStackTrace();
-                System.out.println("Msg failed: \"" + msg + "\"");
             }
         }).start();
 
@@ -65,5 +74,9 @@ public class JavaCroProducer {
 
     public Topic getTopic() {
         return topic;
+    }
+
+    public int getSpeedMsgPerSec() {
+        return speedMsgPerSec;
     }
 }

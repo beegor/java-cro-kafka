@@ -7,6 +7,7 @@
     <link rel="stylesheet" th:href="@{/bootstrap-3.3.6/css/bootstrap.min.css}"/>
     <link rel="stylesheet" th:href="@{/bootstrap-3.3.6/css/bootstrap-theme.min.css}"/>
     <link rel="stylesheet" th:href="@{/style.css}"/>
+    <link rel="stylesheet" th:href="@{/gears.css}"/>
 
     <script th:src="@{/jquery-1.12.3.min.js}"></script>
 
@@ -189,6 +190,9 @@
 
 <script th:inline="javascript">
 
+
+
+
     $("#add-topic-form").submit(function (e) {
 
         var url = $(this).attr("action");
@@ -286,10 +290,70 @@
                 location.reload();
             }
         });
-
         ev.preventDefault();
-
     });
+
+
+    var speeds = [[${speeds}]];
+
+    var producerRotations = {};
+    var consumerRotations = {};
+
+    function getSpeeds() {
+
+        var url = [[@{/state}]] ;
+        $.ajax({
+            type: "POST",
+            url: url,
+            success: function (data) {
+                speeds = data;
+                console.log("speeds: " ,speeds);
+            }
+        });
+    }
+
+    setInterval(getSpeeds, 2000);
+
+
+    setInterval(function(){
+
+        for (var pId in speeds.producerSpeeds){
+
+            var pSpeed = speeds.producerSpeeds[pId];
+            var pRot = producerRotations[pId];
+            if (!pRot) pRot = 0;
+
+            pRot += pSpeed;
+
+            producerRotations[pId] = pRot;
+
+            var gear1Speed = "rotate(" + pRot + "deg)";
+            var gear2Speed = "rotate(" + (pRot * -1) + "deg)";
+            $("#producer-" + pId + " .gears i:first-child ").css('transform', gear1Speed);
+            $("#producer-" + pId + " .gears i:last-child ").css('transform', gear2Speed);
+
+        }
+
+        for (var cId in speeds.consumerSpeeds){
+
+            var cSpeed = speeds.consumerSpeeds[cId];
+            var cRot = consumerRotations[cId];
+            if (!cRot) cRot = 0;
+
+            cRot += cSpeed;
+
+            consumerRotations[cId] = cRot;
+
+            var gear1Speed = "rotate(" + cRot + "deg)";
+            var gear2Speed = "rotate(" + (cRot * -1) + "deg)";
+            $("#consumer-" + cId + " .gears i:first-child ").css('transform', gear1Speed);
+            $("#consumer-" + cId + " .gears i:last-child ").css('transform', gear2Speed);
+
+        }
+
+
+    }, 30);
+
 
 </script>
 

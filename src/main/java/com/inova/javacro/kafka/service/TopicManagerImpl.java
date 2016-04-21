@@ -44,10 +44,12 @@ public class TopicManagerImpl implements TopicManager {
 
         for (scala.collection.Iterator<String> iterator = map.keys().iterator(); iterator.hasNext(); ) {
             String topicValue = iterator.next();
-            TopicMetadata tmd = AdminUtils.fetchTopicMetadataFromZk(topicValue, zkUtils);
-            int partitonCount = tmd.partitionsMetadata().size();
-            Topic topic = new Topic(partitonCount, topicValue, colorPicker.getNextColor());
-            topics.add(topic);
+            if (!topicValue .startsWith("_")) {
+                TopicMetadata tmd = AdminUtils.fetchTopicMetadataFromZk(topicValue, zkUtils);
+                int partitonCount = tmd.partitionsMetadata().size();
+                Topic topic = new Topic(partitonCount, topicValue, colorPicker.getNextColor());
+                topics.add(topic);
+            }
         }
     }
 

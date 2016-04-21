@@ -4,11 +4,14 @@
 
 
 <!--/*@thymesVar id="consumer" type="com.inova.javacro.kafka.core.JavaCroConsumer"*/-->
-    <div th:fragment="consumer(consumerId, consumer)" class="consumer" th:style="|border-color: ${consumer.topic.topicColorHex}|">
+    <div th:fragment="consumer(consumerId, consumer)" th:id="'consumer-' + ${consumerId}" class="consumer" th:style="|border-color: ${consumer.topic.topicColorHex}|" th:attr="data-target-speed=${consumer.speedMsgPerSec}, data-current-speed=${consumer.speedMsgPerSec}">
         <button class="delete-consumer pull-right" th:attr="data-consumer-id=${consumerId}">X</button>
         <h2 th:text="|Consumer|"></h2>
         <h6 th:text="|Id: ${consumerId}|"></h6>
         <h6 th:text="|Group: ${consumer.group}|"></h6>
+        <div class="gears">
+            <i></i><i></i>
+        </div>
     </div>
 
 
