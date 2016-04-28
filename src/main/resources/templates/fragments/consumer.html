@@ -7,11 +7,13 @@
     <div th:fragment="consumer(consumerId, consumer)" th:id="'consumer-' + ${consumerId}" class="consumer" th:style="|border-color: ${consumer.topic.topicColorHex}|" th:attr="data-target-speed=${consumer.speedMsgPerSec}, data-current-speed=${consumer.speedMsgPerSec}">
         <button class="delete-consumer pull-right" th:attr="data-consumer-id=${consumerId}">X</button>
         <h2 th:text="|Consumer|"></h2>
-        <h6 th:text="|Id: ${consumerId}|"></h6>
-        <h6 th:text="|Group: ${consumer.group}|"></h6>
         <div class="gears">
             <i></i><i></i>
         </div>
+        <h6 th:text="|Id: ${consumerId}|"></h6>
+        <h6 th:text="|Group: ${consumer.group}|"></h6>
+        <span class="speed-info"></span>
+        <div style="clear: both"></div>
     </div>
 
 

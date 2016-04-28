@@ -5,19 +5,18 @@ import org.springframework.stereotype.Service;
 import com.inova.javacro.kafka.core.JavaCroConsumer;
 import com.inova.javacro.kafka.core.Topic;
 
+import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
 
 
 @Service
 public class ConsumersManagerImpl implements ConsumersManager {
 
-    private Map<String, JavaCroConsumer> consumers = new ConcurrentHashMap<>();
+    private Map<String, JavaCroConsumer> consumers = new LinkedHashMap<>();
 
     @Override
     public String addConsumer(Topic topic, String group) {
-        String consumerId = UUID.randomUUID().toString();
+        String consumerId = System.currentTimeMillis() + "";
         consumers.put(consumerId, new JavaCroConsumer(consumerId, topic, group));
         return consumerId;
     }

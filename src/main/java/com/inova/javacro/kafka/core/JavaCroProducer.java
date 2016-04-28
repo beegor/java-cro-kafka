@@ -14,13 +14,12 @@ import java.util.concurrent.Future;
 public class JavaCroProducer {
 
     private Properties config = new Properties();
-    private static int msgNo = 1;
     private KafkaProducer producer;
 
     private Topic topic;
 
-    private long lastSendTime = 0;
-    private int speedMsgPerSec = (int) (1 + Math.random() * 10);
+//    private long lastSendTime = 0;
+    private int speedMsgPerSec = 1532;
     private boolean active = false;
 
     private DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd.MM.yyyy  HH:mm:SSS");
@@ -37,13 +36,11 @@ public class JavaCroProducer {
         new Thread(() -> {
             active = true;
             while (active) {
-
                 if (speedMsgPerSec > 0) {
-                    long nextMsgTime = lastSendTime + 1000 / speedMsgPerSec;
-                    long now = System.currentTimeMillis();
-                    if (nextMsgTime < now) {
+                    int msgPer10Milis = speedMsgPerSec / 100;
+//                    System.out.println("Sending " + msgPer10Milis + " messages");
+                    for (int i = 0; i < msgPer10Milis; i++) {
                         sendMessage();
-                        lastSendTime = now;
                     }
                 }
                 Utils.sleep(10);
@@ -58,7 +55,7 @@ public class JavaCroProducer {
             Future<RecordMetadata> result = producer.send(new ProducerRecord(topic.getTopicName(), null, msg));
             try {
                 RecordMetadata metadata = result.get();
-                System.out.println("Sent msg: \"" + msg + "\"");
+//                System.out.println("Sent msg: \"" + msg + "\"");
             } catch (Exception e) {
                 e.printStackTrace();
             }

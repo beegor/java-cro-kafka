@@ -8,7 +8,7 @@ public class Utils {
 
     public static  void sleep(long howLongMS) {
         try {
-            Thread.sleep(howLongMS);
+            Thread.sleep(howLongMS, 0);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }

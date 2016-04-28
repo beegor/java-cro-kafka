@@ -29,6 +29,7 @@ public class TopicManagerImpl implements TopicManager {
 
 
     public TopicManagerImpl() {
+
         ZkConnection zkConnection = new ZkConnection("localhost:2181");
 
         int connectionTimeoutMs = 8 * 1000;

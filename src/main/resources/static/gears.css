@@ -1,33 +1,49 @@
+.producer, .consumer {
+    max-width: 250px;
+}
 
-.gears i {
+.gears {
+    width: 100px;
+    float: right;
+}
+
+.producer .gears i {
     display: block;
     position: relative;
-    width: 30px;
-    height: 30px;
+    width: 50px;
+    height: 50px;
     top: 12px;
     left: 0px;
-    background: url(img/gear.png);
+    background: url(img/gear-hi.png);
+    background-size: contain;
     /*-webkit-animation: barrelRoll infinite linear;*/
     /*-webkit-animation-duration: 10s;*/
     /*-webkit-animation-play-state: running;*/
 }
 
-.gears i:last-of-type {
+.producer  .gears i:last-of-type {
     top: 0px;
-    left: 20px;
+    left: 30px;
     /*-webkit-animation-name: invertBarrelRoll;*/
 }
 
-/*div:hover > i {*/
-    /*!*-webkit-animation-play-state: paused;*!*/
-/*}*/
 
-/*@-webkit-keyframes barrelRoll {*/
-    /*0% { -webkit-transform: rotate(0deg); }*/
-    /*100% { -webkit-transform: rotate(360deg); }*/
-/*}*/
+.consumer .gears i {
+    display: block;
+    position: relative;
+    width: 50px;
+    height: 50px;
+    top: 12px;
+    left: 0px;
+    background: url(img/gear-8.png);
+    background-size: contain;
+    /*-webkit-animation: barrelRoll infinite linear;*/
+    /*-webkit-animation-duration: 10s;*/
+    /*-webkit-animation-play-state: running;*/
+}
 
-/*@-webkit-keyframes invertBarrelRoll {*/
-    /*0% { -webkit-transform: rotate(0deg); }*/
-    /*100% { -webkit-transform: rotate(-360deg); }*/
-/*}*/
+.consumer  .gears i:last-of-type {
+    top: 0px;
+    left: 30px;
+    /*-webkit-animation-name: invertBarrelRoll;*/
+}

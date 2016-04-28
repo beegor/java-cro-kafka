@@ -6,9 +6,7 @@ import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.common.serialization.StringDeserializer;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -20,10 +18,6 @@ public class JavaCroConsumer implements Runnable {
     private final CountDownLatch shutdownLatch;
     private final String group;
     private final Topic topic;
-
-    private long lastFetchSecond = 0;
-    private int speedMsgPerSec = 0;
-
 
 
     public JavaCroConsumer(String id, Topic topic, String group) {
@@ -55,7 +49,6 @@ public class JavaCroConsumer implements Runnable {
     public void run() {
 
         try {
-
             while (!shutdown.get()) {
                 ConsumerRecords<String, String> records = consumer.poll(1000);
                 updateSpeed(records.count());
@@ -68,17 +61,7 @@ public class JavaCroConsumer implements Runnable {
     }
 
     private void process(ConsumerRecord<String, String> record) {
-        System.out.println(record.value());
-    }
-
-
-
-    private void updateSpeed(int recordsCount) {
-        long currentSecond = System.currentTimeMillis() / 1000;
-        if (lastFetchSecond == currentSecond)
-            speedMsgPerSec += recordsCount;
-        else speedMsgPerSec = recordsCount;
-        lastFetchSecond = currentSecond;
+//        System.out.println(record.value());
     }
 
 
@@ -94,7 +77,23 @@ public class JavaCroConsumer implements Runnable {
         return group;
     }
 
+
+
+
+
     public int getSpeedMsgPerSec() {
-        return speedMsgPerSec;
+        int pastSecond = (int) ( System.currentTimeMillis() / 1000) - 1;
+        int msgsInPastSecond =  speedPerSecond.containsKey(pastSecond) ? speedPerSecond.get(pastSecond) : 0;
+        speedPerSecond.entrySet().removeIf( e -> e.getKey() < pastSecond);
+        return msgsInPastSecond;
+    }
+
+    private Map<Integer, Integer> speedPerSecond = new LinkedHashMap<>();
+    private void updateSpeed(int recordsCount) {
+        int currentSecond = (int) (System.currentTimeMillis() / 1000);
+        int currentSecondMsgCount = speedPerSecond.containsKey(currentSecond) ? speedPerSecond.get(currentSecond) : 0;
+        currentSecondMsgCount += recordsCount;
+        speedPerSecond.put(currentSecond, currentSecondMsgCount);
+
     }
 }

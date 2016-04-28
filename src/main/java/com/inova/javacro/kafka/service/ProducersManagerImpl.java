@@ -5,19 +5,18 @@ import org.springframework.stereotype.Service;
 import com.inova.javacro.kafka.core.JavaCroProducer;
 import com.inova.javacro.kafka.core.Topic;
 
+import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
 
 
 @Service
 public class ProducersManagerImpl implements ProducersManager {
 
-    private Map<String, JavaCroProducer> producers = new ConcurrentHashMap<>();
+    private Map<String, JavaCroProducer> producers = new LinkedHashMap<>();
 
     @Override
     public String addProducer(Topic topic) {
-        String producerId = UUID.randomUUID().toString();
+        String producerId = System.currentTimeMillis() + "";
         producers.put(producerId, new JavaCroProducer(producerId, topic));
         return producerId;
     }
