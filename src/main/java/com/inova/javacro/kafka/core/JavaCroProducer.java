@@ -19,7 +19,7 @@ public class JavaCroProducer {
     private Topic topic;
 
 //    private long lastSendTime = 0;
-    private int speedMsgPerSec = 1532;
+    private int speedMsgPerSec = 1500;
     private boolean active = false;
 
     private DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd.MM.yyyy  HH:mm:SSS");
@@ -75,5 +75,9 @@ public class JavaCroProducer {
 
     public int getSpeedMsgPerSec() {
         return speedMsgPerSec;
+    }
+
+    public void setSpeedMsgPerSec(int speedMsgPerSec) {
+        this.speedMsgPerSec = speedMsgPerSec;
     }
 }

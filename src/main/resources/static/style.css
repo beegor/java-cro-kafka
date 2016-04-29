@@ -53,3 +53,14 @@ body{
     margin: 5px 0px !important;
     font-weight: bold !important;
 }
+
+.producer .slider-selection {
+    background: #FF8282;
+}
+.producer .slider-handle {
+    background: red;
+}
+
+.producer .slider-track {
+    background: #660000;
+}

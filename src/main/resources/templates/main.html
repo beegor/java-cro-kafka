@@ -191,13 +191,31 @@
 
 <script th:inline="javascript">
 
+    // <![CDATA[
+
+
+    $(function() {
+
+        $('.producer .speed-slider').slider()
+                .on('slide', function(ev){
+                    var producerId = $(this).closest(".producer").attr("data-producer-id");
+                    var speed = $(this).val();
+
+                    var url = [[@{/producer/update-speed}]] ;
+                    $.ajax({
+                        type: "POST",
+                        url: url,
+                        data: "producerId=" + producerId + "&speedMsgPerSec=" + speed
+                    });
+                });
+    });
+
 
 
 
     $("#add-topic-form").submit(function (e) {
 
         var url = $(this).attr("action");
-
         $.ajax({
             type: "POST",
             url: url,
@@ -210,10 +228,11 @@
         e.preventDefault(); // avoid to execute the actual submit of the form.
     });
 
+
+
     $("#add-producer-form").submit(function (e) {
 
         var url = $(this).attr("action");
-
         $.ajax({
             type: "POST",
             url: url,
@@ -222,9 +241,10 @@
                 location.reload();
             }
         });
-
         e.preventDefault(); // avoid to execute the actual submit of the form.
     });
+
+
 
     $("#add-consumer-form").submit(function (e) {
 
@@ -263,7 +283,7 @@
     $(".delete-producer").on("click", function (ev) {
 
         var url = [[@{/producer/delete}]] ;
-        var producerId = $(this).attr("data-producer-id");
+        var producerId = $(this).closest("div").attr("data-producer-id");
 
         $.ajax({
             type: "POST",
@@ -300,6 +320,7 @@
     var producerRotations = {};
     var consumerRotations = {};
 
+    var lastSpeedUpateTime = 0;
     function getSpeeds() {
 
         var url = [[@{/state}]] ;
@@ -308,13 +329,27 @@
             url: url,
             success: function (data) {
                 speeds = data;
-                console.log("speeds: " ,speeds);
+                lastSpeedUpateTime = new Date().getTime();
+            },
+            error: function (xhr, ajaxOptions, thrownError) {
+                alert(xhr.status);
+                alert(thrownError);
             }
         });
+
+        //ugly hack to set speeds to 0 if can't read speeds from servers
+        var now = new Date().getTime();
+        if (now - lastSpeedUpateTime > 2000){
+            for (var pId in speeds.producerSpeeds){
+                speeds.producerSpeeds[pId] = 0;
+            }
+            for (var cId in speeds.consumerSpeeds){
+                speeds.consumerSpeeds[cId] = 0;
+            }
+        }
     }
 
     setInterval(getSpeeds, 500);
-
 
     setInterval(function(){
 
@@ -324,7 +359,8 @@
             var pRot = producerRotations[pId];
             if (!pRot) pRot = 0;
 
-            var rotAdd = pSpeed /1000;
+//            var rotAdd = Math.min((pSpeed /1000) % 360, 100) ;
+            var rotAdd = 10;
             pRot += rotAdd;
 
             producerRotations[pId] = pRot;
@@ -343,7 +379,8 @@
             var cRot = consumerRotations[cId];
             if (!cRot) cRot = 0;
 
-            var rotAdd = cSpeed /1000;
+//            var rotAdd = Math.min((cSpeed /1000) % 360, 100);
+            var rotAdd = 20;
             cRot += rotAdd;
 
             consumerRotations[cId] = cRot;
@@ -357,13 +394,14 @@
         }
 
 
-    }, 30);
+    }, 40);
 
+    // ]]>
 
 </script>
 
 <script th:src="@{/bootstrap-3.3.6/js/bootstrap.min.js}"></script>
-<script th:src="@{/sliderjs/bootstrap-slider.js}"></script>
+<script th:src="@{/slider/js/bootstrap-slider.js}"></script>
 
 </body>
 </html>

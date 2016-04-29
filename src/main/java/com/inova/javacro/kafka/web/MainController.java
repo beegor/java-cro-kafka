@@ -40,7 +40,6 @@ public class MainController {
     }
 
 
-
     @RequestMapping(value = "/state", produces = "application/json")
     @ResponseBody
     public Map<String, Map<String, Integer> >  getState() {

@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.inova.javacro.kafka.core.JavaCroProducer;
 import com.inova.javacro.kafka.core.Topic;
 import com.inova.javacro.kafka.service.ProducersManager;
 import com.inova.javacro.kafka.service.TopicManager;
@@ -51,5 +52,22 @@ public class ProducersController {
         }
     }
 
+
+    @ResponseBody
+    @RequestMapping("/update-speed")
+    public String updateSpeed(@RequestParam String producerId, @RequestParam Integer speedMsgPerSec) {
+
+        try {
+            JavaCroProducer producer = producersManager.getProducers().get(producerId);
+            if (producer != null){
+                producer.setSpeedMsgPerSec(speedMsgPerSec);
+                return "Producer speed successfully updated";
+            }
+            else
+                return "No producer with id: " + producerId;
+        } catch (Exception e) {
+            return "ERROR: " + e.getMessage();
+        }
+    }
 
 }

@@ -4,8 +4,8 @@
 
 
 <!--/*@thymesVar id="producer" type="com.inova.javacro.kafka.core.JavaCroProducer"*/-->
-    <div th:fragment="producer(producerId, producer)" th:id="'producer-' + ${producerId}" class="producer" th:style="|border-color: ${producer.topic.topicColorHex}|" >
-        <button class="delete-producer pull-right" th:attr="data-producer-id=${producerId}">X</button>
+    <div th:fragment="producer(producerId, producer)" th:id="'producer-' + ${producerId}" th:attr="data-producer-id=${producerId}" class="producer" th:style="|border-color: ${producer.topic.topicColorHex}|" >
+        <button class="delete-producer pull-right" >X</button>
         <h2 th:text="|Producer|"></h2>
 
         <div class="gears">
@@ -13,8 +13,11 @@
         </div>
 
         <h6 th:text="${producerId}"></h6>
-        <span class="speed-info"></span>
         <div style="clear: both"></div>
+        <span class="speed-info"></span>
+        <input type="text" class="speed-slider" value="" data-slider-min="0" data-slider-max="100000" data-slider-step="100" th:attr="data-slider-value=${producer.speedMsgPerSec}"
+               data-slider-orientation="horizontal" data-slider-selection="before" data-slider-tooltip="show"/>
+
     </div>
 
 
