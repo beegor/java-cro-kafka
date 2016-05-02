@@ -4,19 +4,20 @@
 
 
 <!--/*@thymesVar id="producer" type="com.inova.javacro.kafka.core.JavaCroProducer"*/-->
-    <div th:fragment="producer(producerId, producer)" th:id="'producer-' + ${producerId}" th:attr="data-producer-id=${producerId}" class="producer" th:style="|border-color: ${producer.topic.topicColorHex}|" >
-        <button class="delete-producer pull-right" >X</button>
-        <h2 th:text="|Producer|"></h2>
+    <div th:fragment="producer(producerId, producer)" th:id="'producer-' + ${producerId}" th:attr="data-producer-id=${producerId}" class="producer"  >
+        <button class="btn btn-danger delete-producer pull-right" >X</button>
+        <h2 th:text="|P ${producerId}|" th:style="|background-color: ${producer.topic.topicColorHex}|"></h2>
 
-        <div class="gears">
-            <i></i><i></i>
+        <div class="producer-body">
+            <div class="gears">
+                <i></i><i></i>
+            </div>
+            <div style="clear: both"></div>
+            <div class="pull-right" th:text="${producer.topic.topicName}"></div>
+            <div class="speed-info"></div>
+            <input type="text" class="speed-slider" value="" data-slider-min="0" data-slider-max="20000" data-slider-step="100" th:attr="data-slider-value=${producer.speedMsgPerSec}"
+                   data-slider-orientation="horizontal" data-slider-selection="before" data-slider-tooltip="show" style="width: 100%"/>
         </div>
-
-        <h6 th:text="${producerId}"></h6>
-        <div style="clear: both"></div>
-        <span class="speed-info"></span>
-        <input type="text" class="speed-slider" value="" data-slider-min="0" data-slider-max="100000" data-slider-step="100" th:attr="data-slider-value=${producer.speedMsgPerSec}"
-               data-slider-orientation="horizontal" data-slider-selection="before" data-slider-tooltip="show"/>
 
     </div>
 

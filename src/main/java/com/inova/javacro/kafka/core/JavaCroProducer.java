@@ -18,7 +18,6 @@ public class JavaCroProducer {
 
     private Topic topic;
 
-//    private long lastSendTime = 0;
     private int speedMsgPerSec = 1500;
     private boolean active = false;
 

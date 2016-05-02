@@ -2,7 +2,16 @@
     max-width: 250px;
 }
 
-.gears {
+.producer .gears {
+    width: 180px;
+    height: 150px;
+    margin-left: auto;
+    margin-right: auto;
+    /*float: right;*/
+}
+
+
+.consumer .gears {
     width: 100px;
     float: right;
 }
@@ -10,11 +19,11 @@
 .producer .gears i {
     display: block;
     position: relative;
-    width: 50px;
-    height: 50px;
+    width: 100px;
+    height: 100px;
     top: 12px;
     left: 0px;
-    background: url(img/gear-hi.png);
+    background: url(img/cog-1.png);
     background-size: contain;
     /*-webkit-animation: barrelRoll infinite linear;*/
     /*-webkit-animation-duration: 10s;*/
@@ -22,8 +31,8 @@
 }
 
 .producer  .gears i:last-of-type {
-    top: -6px;
-    left: 32px;
+    top: -55px;
+    left: 78px;
     /*-webkit-animation-name: invertBarrelRoll;*/
 }
 
@@ -35,15 +44,9 @@
     height: 100px;
     top: 0px;
     left: 0px;
-    background: url(img/gear-i.png);
+    background: url(img/cog-3.png);
     background-size: contain;
     /*-webkit-animation: barrelRoll infinite linear;*/
     /*-webkit-animation-duration: 10s;*/
     /*-webkit-animation-play-state: running;*/
 }
-
-/*.consumer  .gears i:last-of-type {*/
-    /*top: 0px;*/
-    /*left: 30px;*/
-    /*!*-webkit-animation-name: invertBarrelRoll;*!*/
-/*}*/

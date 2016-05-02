@@ -16,14 +16,17 @@
 </head>
 <body>
 
-<h1>Kafka Rulz</h1>
-<h6>Akka Sucks</h6>
 
 <!--/*@thymesVar id="topics" type="java.util.List<com.inova.javacro.kafka.core.Topic>"*/-->
 <!--/*@thymesVar id="producers" type="java.util.Map<java.lang.String, com.inova.javacro.kafka.core.JavaCroProducer>"*/-->
-<!--/*@thymesVar id="consumers" type="java.util.Map<java.lang.String, com.inova.javacro.kafka.core.JavaCroConsumer>"*/-->
+<!--/*@thymesVar id="consumers" type="java.util.Map<java.lang.String, java.util.List<com.inova.javacro.kafka.core.JavaCroConsumer>>"*/-->
 
-<div class="container-fluid">
+<div class="container">
+
+
+    <h1>JavaCro 2016 Kafka Demo</h1>
+    <hr/>
+
     <div class="row">
         <div class="col-xs-4">
             <div class="box">
@@ -76,8 +79,12 @@
                     <div class="clearboth"></div>
                 </div>
 
-                <div th:each="entry : ${consumers.entrySet()}" >
-                    <div th:replace="fragments/consumer :: consumer(${entry.key}, ${entry.value})"></div>
+                <div th:each="entry : ${consumers.entrySet()}" class="consumer-group">
+                    <h2 th:text="|${entry.key}|"></h2>
+                    <div th:each="con : ${entry.value}" >
+                        <div th:replace="fragments/consumer :: consumer(${con.id}, ${con})"></div>
+                    </div>
+
                 </div>
 
             </div>
@@ -332,24 +339,32 @@
                 lastSpeedUpateTime = new Date().getTime();
             },
             error: function (xhr, ajaxOptions, thrownError) {
-                alert(xhr.status);
-                alert(thrownError);
+//                alert(xhr.status);
+//                alert(thrownError);
+                for (var pId in speeds.producerSpeeds){
+                    speeds.producerSpeeds[pId] = 0;
+                }
+                for (var cId in speeds.consumerSpeeds){
+                    speeds.consumerSpeeds[cId] = 0;
+                }
             }
         });
 
         //ugly hack to set speeds to 0 if can't read speeds from servers
-        var now = new Date().getTime();
-        if (now - lastSpeedUpateTime > 2000){
-            for (var pId in speeds.producerSpeeds){
-                speeds.producerSpeeds[pId] = 0;
-            }
-            for (var cId in speeds.consumerSpeeds){
-                speeds.consumerSpeeds[cId] = 0;
-            }
-        }
+//        var now = new Date().getTime();
+//        if (now - lastSpeedUpateTime > 2000){
+//            for (var pId in speeds.producerSpeeds){
+//                speeds.producerSpeeds[pId] = 0;
+//            }
+//            for (var cId in speeds.consumerSpeeds){
+//                speeds.consumerSpeeds[cId] = 0;
+//            }
+//        }
     }
 
     setInterval(getSpeeds, 500);
+
+    var speedmax = 20000;
 
     setInterval(function(){
 
@@ -359,8 +374,7 @@
             var pRot = producerRotations[pId];
             if (!pRot) pRot = 0;
 
-//            var rotAdd = Math.min((pSpeed /1000) % 360, 100) ;
-            var rotAdd = 10;
+            var rotAdd = (pSpeed/speedmax) * 15;
             pRot += rotAdd;
 
             producerRotations[pId] = pRot;
@@ -369,7 +383,7 @@
             var gear2Speed = "rotate(" + (pRot * -1) + "deg)";
             $("#producer-" + pId + " .gears i:first-child ").css('transform', gear1Speed);
             $("#producer-" + pId + " .gears i:last-child ").css('transform', gear2Speed);
-            $("#producer-" + pId + " .speed-info").text(pSpeed + " msg/sec");
+            $("#producer-" + pId + " .speed-info").text(pSpeed + " m/s");
 
         }
 
@@ -379,8 +393,7 @@
             var cRot = consumerRotations[cId];
             if (!cRot) cRot = 0;
 
-//            var rotAdd = Math.min((cSpeed /1000) % 360, 100);
-            var rotAdd = 20;
+            var rotAdd = (cSpeed/speedmax) * 15;
             cRot += rotAdd;
 
             consumerRotations[cId] = cRot;
@@ -389,10 +402,8 @@
             var gear2Speed = "rotate(" + (cRot * -1) + "deg)";
             $("#consumer-" + cId + " .gears i:first-child ").css('transform', gear1Speed);
             $("#consumer-" + cId + " .gears i:last-child ").css('transform', gear2Speed);
-            $("#consumer-" + cId + " .speed-info").text(cSpeed + " msg/sec");
-
+            $("#consumer-" + cId + " .speed-info").text(cSpeed + " m/s");
         }
-
 
     }, 40);
 

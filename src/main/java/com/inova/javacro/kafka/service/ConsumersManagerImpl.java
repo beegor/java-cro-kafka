@@ -5,6 +5,8 @@ import org.springframework.stereotype.Service;
 import com.inova.javacro.kafka.core.JavaCroConsumer;
 import com.inova.javacro.kafka.core.Topic;
 
+import javax.annotation.PreDestroy;
+import java.time.LocalTime;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -16,7 +18,7 @@ public class ConsumersManagerImpl implements ConsumersManager {
 
     @Override
     public String addConsumer(Topic topic, String group) {
-        String consumerId = System.currentTimeMillis() + "";
+        String consumerId =  LocalTime.now().toSecondOfDay() + "";
         consumers.put(consumerId, new JavaCroConsumer(consumerId, topic, group));
         return consumerId;
     }
@@ -32,5 +34,13 @@ public class ConsumersManagerImpl implements ConsumersManager {
     @Override
     public Map<String, JavaCroConsumer> getConsumers() {
         return consumers;
+    }
+
+
+    @PreDestroy
+    public void destroy(){
+        for (JavaCroConsumer consumer : consumers.values()) {
+            consumer.stop();
+        }
     }
 }

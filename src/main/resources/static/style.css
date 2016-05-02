@@ -1,5 +1,5 @@
 body{
-    background-color: #d4d4d4;
+    /*background-color: #d4d4d4;*/
 }
 
 .clearboth {
@@ -7,28 +7,31 @@ body{
 }
 
 .box {
-    border: solid 10px #0f0f0f;
+    border: solid 1px #5581a4;
     border-radius: 5px;
-    background-color: white;
+    background-color: #ccdcec;
+    min-height: 600px;
+    vertical-align: middle;
 }
 
 .titlebar{
     padding: 5px;
-    background-color: black;
+    background-color: #435162;
     color: white;
 }
 
 .titlebar h1 {
-    margin: 0px !important;
+    margin: 5px 0px 0px 0px !important;
     font-size: 20px;
     font-weight: bold;
 }
 
 .topic {
-    border: solid 25px;
+    border: solid 5px;
     border-radius: 10px;
-    margin: 30px;
+    margin: 20px 20px 30px 20px;
     padding: 5px;
+    background-color: white;
 }
 
 .topic h2 {
@@ -43,15 +46,31 @@ body{
 }
 
 .producer, .consumer {
-    border: solid 25px;
+    border: solid 1px;
     border-radius: 20px;
-    margin: 20px;
-    padding: 5px;
+    margin: 20px auto 20px auto;
+    padding: 0px;
+    background-color: white;
+    display: block;
+    width: 300px;
 }
 
 .producer h2, .consumer h2 {
-    margin: 5px 0px !important;
+    margin: 0px 0px !important;
     font-weight: bold !important;
+    border-radius: 20px;
+    padding: 2px 10px;
+    color: white;
+}
+
+.producer-body, .consumer-body {
+    padding: 10px;
+    font-size: 16px;
+}
+
+.producer button, .consumer button {
+    border-radius: 20px;
+    margin: 1px 1px 0px 0px;
 }
 
 .producer .slider-selection {
@@ -63,4 +82,22 @@ body{
 
 .producer .slider-track {
     background: #660000;
+}
+
+.consumer-group {
+    border: solid 1px dimgray;
+    width:320px;
+    margin: 20px auto 20px auto;
+    padding: 10px;
+    background-color: #e8ded2;
+    border-radius: 10px;
+    display: block;
+}
+
+.consumer-group h2{
+    margin: 0px;
+}
+
+.consumer .speed-info{
+    font-size: 26px;
 }

@@ -5,6 +5,8 @@ import org.springframework.stereotype.Service;
 import com.inova.javacro.kafka.core.JavaCroProducer;
 import com.inova.javacro.kafka.core.Topic;
 
+import javax.annotation.PreDestroy;
+import java.time.LocalTime;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -16,7 +18,7 @@ public class ProducersManagerImpl implements ProducersManager {
 
     @Override
     public String addProducer(Topic topic) {
-        String producerId = System.currentTimeMillis() + "";
+        String producerId = LocalTime.now().toSecondOfDay() + "";
         producers.put(producerId, new JavaCroProducer(producerId, topic));
         return producerId;
     }
@@ -32,5 +34,13 @@ public class ProducersManagerImpl implements ProducersManager {
     @Override
     public Map<String, JavaCroProducer> getProducers() {
         return producers;
+    }
+
+
+    @PreDestroy
+    public void destroy(){
+        for (JavaCroProducer producer : producers.values()) {
+            producer.stop();
+        }
     }
 }

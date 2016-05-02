@@ -18,12 +18,14 @@ public class JavaCroConsumer implements Runnable {
     private final CountDownLatch shutdownLatch;
     private final String group;
     private final Topic topic;
+    private final String id;
 
 
     public JavaCroConsumer(String id, Topic topic, String group) {
 
         this.topic = topic;
         this.group = group;
+        this.id = id;
 
         Properties config = new Properties();
         config.put("client.id", id);
@@ -77,11 +79,11 @@ public class JavaCroConsumer implements Runnable {
         return group;
     }
 
+    public String getId() {
+        return id;
+    }
 
-
-
-
-    public int getSpeedMsgPerSec() {
+    public synchronized int getSpeedMsgPerSec() {
         int pastSecond = (int) ( System.currentTimeMillis() / 1000) - 1;
         int msgsInPastSecond =  speedPerSecond.containsKey(pastSecond) ? speedPerSecond.get(pastSecond) : 0;
         speedPerSecond.entrySet().removeIf( e -> e.getKey() < pastSecond);

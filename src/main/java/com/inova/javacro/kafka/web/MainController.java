@@ -6,12 +6,12 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.inova.javacro.kafka.core.JavaCroConsumer;
 import com.inova.javacro.kafka.service.ConsumersManager;
 import com.inova.javacro.kafka.service.ProducersManager;
 import com.inova.javacro.kafka.service.TopicManager;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 
@@ -34,7 +34,17 @@ public class MainController {
     public String showMainPage(Model model) {
         model.addAttribute("topics", topicManager.getTopics());
         model.addAttribute("producers", producersManager.getProducers());
-        model.addAttribute("consumers", consumersManager.getConsumers());
+        Map<String, List<JavaCroConsumer>> consumers = new LinkedHashMap<>();
+        consumersManager.getConsumers().entrySet().stream().forEach(entry -> {
+            String groupName = entry.getValue().getTopic().getTopicName() + " | " + entry.getValue().getGroup();
+            List<JavaCroConsumer> groupConsumers = consumers.get(groupName);
+            if (groupConsumers == null){
+                groupConsumers = new ArrayList<>();
+                consumers.put(groupName, groupConsumers);
+            }
+            groupConsumers.add(entry.getValue());
+        });
+        model.addAttribute("consumers", consumers);
         model.addAttribute("speeds", getSpeedsMap());
         return "main";
     }
