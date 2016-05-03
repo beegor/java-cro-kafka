@@ -3,13 +3,13 @@ package com.inova.javacro.kafka.core;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.clients.producer.ProducerRecord;
-import org.apache.kafka.clients.producer.RecordMetadata;
 import org.apache.kafka.common.serialization.StringSerializer;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.Properties;
-import java.util.concurrent.Future;
 
 public class JavaCroProducer {
 
@@ -18,8 +18,9 @@ public class JavaCroProducer {
 
     private Topic topic;
 
-    private int speedMsgPerSec = 1500;
+    private int targetSpeed = 1500;
     private boolean active = false;
+    private int speedMsgPerSec = 0;
 
     private DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd.MM.yyyy  HH:mm:SSS");
 
@@ -33,13 +34,14 @@ public class JavaCroProducer {
         producer = new KafkaProducer<String, String>(config);
 
         new Thread(() -> {
+
             active = true;
             while (active) {
-                if (speedMsgPerSec > 0) {
-                    int msgPer10Milis = speedMsgPerSec / 100;
-//                    System.out.println("Sending " + msgPer10Milis + " messages");
+                if (targetSpeed > 0) {
+                    int msgPer10Milis = targetSpeed / 100;
                     for (int i = 0; i < msgPer10Milis; i++) {
                         sendMessage();
+                        updateSpeed(1);
                     }
                 }
                 Utils.sleep(10);
@@ -49,17 +51,8 @@ public class JavaCroProducer {
 
 
     private void sendMessage() {
-        new Thread(() -> {
-            String msg = "Poruka  " + LocalDateTime.now().format(dtf);
-            Future<RecordMetadata> result = producer.send(new ProducerRecord(topic.getTopicName(), null, msg));
-            try {
-                RecordMetadata metadata = result.get();
-//                System.out.println("Sent msg: \"" + msg + "\"");
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }).start();
-
+        String msg = "Poruka  " + LocalDateTime.now().format(dtf);
+        producer.send(new ProducerRecord(topic.getTopicName(), null, msg));
     }
 
 
@@ -72,11 +65,24 @@ public class JavaCroProducer {
         return topic;
     }
 
-    public int getSpeedMsgPerSec() {
-        return speedMsgPerSec;
+
+    public synchronized int getSpeedMsgPerSec() {
+        int pastSecond = (int) ( System.currentTimeMillis() / 1000) - 1;
+        int msgsInPastSecond =  speedPerSecond.containsKey(pastSecond) ? speedPerSecond.get(pastSecond) : 0;
+        speedPerSecond.entrySet().removeIf( e -> e.getKey() < pastSecond);
+        return msgsInPastSecond;
     }
 
-    public void setSpeedMsgPerSec(int speedMsgPerSec) {
-        this.speedMsgPerSec = speedMsgPerSec;
+    private Map<Integer, Integer> speedPerSecond = new LinkedHashMap<>();
+    private void updateSpeed(int recordsCount) {
+        int currentSecond = (int) (System.currentTimeMillis() / 1000);
+        int currentSecondMsgCount = speedPerSecond.containsKey(currentSecond) ? speedPerSecond.get(currentSecond) : 0;
+        currentSecondMsgCount += recordsCount;
+        speedPerSecond.put(currentSecond, currentSecondMsgCount);
+    }
+
+
+    public void setTargetSpeed(int targetSpeed) {
+        this.targetSpeed = targetSpeed;
     }
 }

@@ -60,7 +60,7 @@ public class ProducersController {
         try {
             JavaCroProducer producer = producersManager.getProducers().get(producerId);
             if (producer != null){
-                producer.setSpeedMsgPerSec(speedMsgPerSec);
+                producer.setTargetSpeed(speedMsgPerSec);
                 return "Producer speed successfully updated";
             }
             else
