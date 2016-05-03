@@ -80,7 +80,7 @@
                 </div>
 
                 <div th:each="entry : ${consumers.entrySet()}" class="consumer-group">
-                    <h2 th:text="|${entry.key}|"></h2>
+                    <h3 th:utext="|${entry.key}|"></h3>
                     <div th:each="con : ${entry.value}" >
                         <div th:replace="fragments/consumer :: consumer(${con.id}, ${con})"></div>
                     </div>

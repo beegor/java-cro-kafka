@@ -36,7 +36,7 @@ public class MainController {
         model.addAttribute("producers", producersManager.getProducers());
         Map<String, List<JavaCroConsumer>> consumers = new LinkedHashMap<>();
         consumersManager.getConsumers().entrySet().stream().forEach(entry -> {
-            String groupName = entry.getValue().getTopic().getTopicName() + " | " + entry.getValue().getGroup();
+            String groupName = entry.getValue().getTopic().getTopicName().toUpperCase() + "&nbsp;&nbsp;&nbsp;&nbsp;" + entry.getValue().getGroup().toUpperCase();
             List<JavaCroConsumer> groupConsumers = consumers.get(groupName);
             if (groupConsumers == null){
                 groupConsumers = new ArrayList<>();

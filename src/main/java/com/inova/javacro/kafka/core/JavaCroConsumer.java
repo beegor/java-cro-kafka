@@ -96,7 +96,5 @@ public class JavaCroConsumer implements Runnable {
         int currentSecondMsgCount = speedPerSecond.containsKey(currentSecond) ? speedPerSecond.get(currentSecond) : 0;
         currentSecondMsgCount += recordsCount;
         speedPerSecond.put(currentSecond, currentSecondMsgCount);
-
-
     }
 }

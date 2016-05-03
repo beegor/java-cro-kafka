@@ -94,10 +94,10 @@ body{
     display: block;
 }
 
-.consumer-group h2{
+.consumer-group h2, .consumer-group h3{
     margin: 0px;
 }
 
 .consumer .speed-info{
-    font-size: 26px;
+    font-size: 20px;
 }
