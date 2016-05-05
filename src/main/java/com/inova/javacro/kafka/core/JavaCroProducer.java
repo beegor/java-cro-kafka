@@ -1,12 +1,13 @@
 package com.inova.javacro.kafka.core;
 
-import org.apache.kafka.clients.producer.KafkaProducer;
-import org.apache.kafka.clients.producer.ProducerConfig;
-import org.apache.kafka.clients.producer.ProducerRecord;
+import org.apache.kafka.clients.producer.*;
 import org.apache.kafka.common.serialization.StringSerializer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -22,10 +23,18 @@ public class JavaCroProducer {
     private boolean active = false;
     private int speedMsgPerSec = 0;
 
+    private final Logger log;
+
+    private Map<String, Long> partitionOffsets = new HashMap<>();
+
+
     private DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd.MM.yyyy  HH:mm:SSS");
 
     public JavaCroProducer(String id, Topic topic) {
+
         this.topic = topic;
+        log = LoggerFactory.getLogger("PRODUCER-" + id);
+
         config.put("client.id", id);
         config.put("bootstrap.servers", "localhost:9092");
         config.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
@@ -50,9 +59,10 @@ public class JavaCroProducer {
     }
 
 
+
     private void sendMessage() {
         String msg = "Poruka  " + LocalDateTime.now().format(dtf);
-        producer.send(new ProducerRecord(topic.getTopicName(), null, msg));
+        producer.send(new ProducerRecord(topic.getTopicName(), null, msg), msgSendListener);
     }
 
 
@@ -85,4 +95,20 @@ public class JavaCroProducer {
     public void setTargetSpeed(int targetSpeed) {
         this.targetSpeed = targetSpeed;
     }
+
+
+    private Callback msgSendListener = new Callback() {
+
+        private long lastLogTime = 0;
+
+        @Override
+        public void onCompletion(RecordMetadata data, Exception exception) {
+            if (System.currentTimeMillis() - lastLogTime > 1000) {
+                partitionOffsets.put(topic.getTopicName() + "_" + data.partition(), data.offset());
+                log.debug("Offset for partition {} : {}", data.partition(), data.offset());
+                lastLogTime = System.currentTimeMillis();
+
+            }
+        }
+    };
 }

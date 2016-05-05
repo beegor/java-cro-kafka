@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.inova.javacro.kafka.core.JavaCroConsumer;
+import com.inova.javacro.kafka.core.Topic;
 import com.inova.javacro.kafka.service.ConsumersManager;
 import com.inova.javacro.kafka.service.ProducersManager;
 import com.inova.javacro.kafka.service.TopicManager;
@@ -46,6 +47,7 @@ public class MainController {
         });
         model.addAttribute("consumers", consumers);
         model.addAttribute("speeds", getSpeedsMap());
+        model.addAttribute("partitionSizes", getPartitionSizes());
         return "main";
     }
 
@@ -71,5 +73,16 @@ public class MainController {
         speeds.put("producerSpeeds", producerSpeeds);
         speeds.put("consumerSpeeds", consumerSpeeds);
         return speeds;
+    }
+
+    public Map<String, Long> getPartitionSizes() {
+
+        Map<String, Long> partitionSizes = new HashMap<>();
+        for (Topic topic : topicManager.getTopics()) {
+            for (int partition = 0; partition < topic.getPartitionCount(); partition++) {
+
+            }
+        }
+        return partitionSizes;
     }
 }

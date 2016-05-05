@@ -7,11 +7,11 @@
     </appender>
 
     <appender name="file" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>${log.base:-/tmp}/lotto.log</file>
+        <file>${log.base:-/tmp}/javacro-kafka.log</file>
         <append>true</append>
 
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <fileNamePattern>${log.base:-/tmp}/lotto.log.%d{yyyy-MM-dd}</fileNamePattern>
+            <fileNamePattern>${log.base:-/tmp}/javacro-kafka.log.%d{yyyy-MM-dd}</fileNamePattern>
             <maxHistory>365</maxHistory>
         </rollingPolicy>
 

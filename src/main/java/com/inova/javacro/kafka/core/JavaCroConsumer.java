@@ -5,6 +5,8 @@ import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.common.serialization.StringDeserializer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
 import java.util.concurrent.CountDownLatch;
@@ -20,12 +22,18 @@ public class JavaCroConsumer implements Runnable {
     private final Topic topic;
     private final String id;
 
+    private final Logger log;
+
+    private Map<String, Long> partitionOffsets = new HashMap<>();
+
 
     public JavaCroConsumer(String id, Topic topic, String group) {
 
         this.topic = topic;
         this.group = group;
         this.id = id;
+
+        log = LoggerFactory.getLogger("CONSUMER-" + id);
 
         Properties config = new Properties();
         config.put("client.id", id);
@@ -53,7 +61,8 @@ public class JavaCroConsumer implements Runnable {
         try {
             while (!shutdown.get()) {
                 ConsumerRecords<String, String> records = consumer.poll(1000);
-                updateSpeed(records.count());
+
+                updateSpeed(records);
                 records.forEach(record -> process(record));
             }
         } finally {
@@ -83,6 +92,10 @@ public class JavaCroConsumer implements Runnable {
         return id;
     }
 
+
+
+
+
     public synchronized int getSpeedMsgPerSec() {
         int pastSecond = (int) ( System.currentTimeMillis() / 1000) - 1;
         int msgsInPastSecond =  speedPerSecond.containsKey(pastSecond) ? speedPerSecond.get(pastSecond) : 0;
@@ -91,10 +104,20 @@ public class JavaCroConsumer implements Runnable {
     }
 
     private Map<Integer, Integer> speedPerSecond = new LinkedHashMap<>();
-    private void updateSpeed(int recordsCount) {
+
+    private void updateSpeed(ConsumerRecords<String, String> records) {
+
         int currentSecond = (int) (System.currentTimeMillis() / 1000);
         int currentSecondMsgCount = speedPerSecond.containsKey(currentSecond) ? speedPerSecond.get(currentSecond) : 0;
-        currentSecondMsgCount += recordsCount;
+        currentSecondMsgCount += records.count();
         speedPerSecond.put(currentSecond, currentSecondMsgCount);
+
+        records.partitions().forEach(p -> {
+            int partition = p.partition();
+            long offset= consumer.position(p);
+            partitionOffsets.put(topic.getTopicName()+ "_" + group + "_" + partition, offset);
+        });
+
+
     }
 }
