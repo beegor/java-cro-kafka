@@ -7,10 +7,10 @@ import org.slf4j.LoggerFactory;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Properties;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class JavaCroProducer {
 
@@ -25,7 +25,7 @@ public class JavaCroProducer {
 
     private final Logger log;
 
-    private Map<String, Long> partitionOffsets = new HashMap<>();
+    private Map<String, Long> partitionOffsets = new ConcurrentHashMap<>();
 
 
     private DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd.MM.yyyy  HH:mm:SSS");
@@ -60,9 +60,11 @@ public class JavaCroProducer {
 
 
 
+    long msgNo = 0;
     private void sendMessage() {
-        String msg = "Poruka  " + LocalDateTime.now().format(dtf);
-        producer.send(new ProducerRecord(topic.getTopicName(), null, msg), msgSendListener);
+        String timeStr = LocalDateTime.now().format(dtf);
+        String msg = "Poruka  " + timeStr;
+        producer.send(new ProducerRecord(topic.getTopicName(), timeStr, msg), msgSendListener);
     }
 
 
@@ -96,6 +98,9 @@ public class JavaCroProducer {
         this.targetSpeed = targetSpeed;
     }
 
+    public Map<String, Long> getPartitionOffsets() {
+        return partitionOffsets;
+    }
 
     private Callback msgSendListener = new Callback() {
 
@@ -103,8 +108,8 @@ public class JavaCroProducer {
 
         @Override
         public void onCompletion(RecordMetadata data, Exception exception) {
+            partitionOffsets.put(topic.getTopicName() + "_" + data.partition(), data.offset());
             if (System.currentTimeMillis() - lastLogTime > 1000) {
-                partitionOffsets.put(topic.getTopicName() + "_" + data.partition(), data.offset());
                 log.debug("Offset for partition {} : {}", data.partition(), data.offset());
                 lastLogTime = System.currentTimeMillis();
 

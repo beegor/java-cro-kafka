@@ -39,10 +39,20 @@ body{
     font-weight: bold !important;
 }
 
-.partition {
-    height: 15px;
-    background-color: #919191;
-    margin-top: 10px;
+/*.partition {*/
+    /*height: 15px;*/
+    /*background-color: #919191;*/
+    /*margin-top: 10px;*/
+    /*color: white;*/
+/*}*/
+
+.progress{
+    overflow: visible !important;
+    margin-bottom: 25px !important;
+}
+
+.partition .progress-bar{
+    background-image: none !important;
 }
 
 .producer, .consumer {

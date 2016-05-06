@@ -61,7 +61,7 @@
 
 
                 <div th:each="topic : ${topics}" >
-                    <div th:replace="fragments/topic :: topic(${topic})"></div>
+                    <div th:replace="fragments/topic :: topic(${topic}, ${partitionSizes})"></div>
                 </div>
 
             </div>
@@ -328,15 +328,17 @@
     var consumerRotations = {};
 
     var lastSpeedUpateTime = 0;
-    function getSpeeds() {
+
+    function getState() {
 
         var url = [[@{/state}]] ;
         $.ajax({
             type: "POST",
             url: url,
             success: function (data) {
-                speeds = data;
+                speeds = data.speeds;
                 lastSpeedUpateTime = new Date().getTime();
+                updatePartitionSizes(data.partitionSizes);
             },
             error: function (xhr, ajaxOptions, thrownError) {
 //                alert(xhr.status);
@@ -349,20 +351,25 @@
                 }
             }
         });
-
-        //ugly hack to set speeds to 0 if can't read speeds from servers
-//        var now = new Date().getTime();
-//        if (now - lastSpeedUpateTime > 2000){
-//            for (var pId in speeds.producerSpeeds){
-//                speeds.producerSpeeds[pId] = 0;
-//            }
-//            for (var cId in speeds.consumerSpeeds){
-//                speeds.consumerSpeeds[cId] = 0;
-//            }
-//        }
     }
 
-    setInterval(getSpeeds, 500);
+    var partitionMaxSize = 10000000;
+    function updatePartitionSizes(partitionSizeMap){
+
+        for (var partitionKey in partitionSizeMap) {
+            var filledPerc =  100 * partitionSizeMap[partitionKey] / partitionMaxSize;
+            filledPerc = Math.min(100, filledPerc);
+            var freeSpacePerc = 100 - filledPerc;
+            $("#" + partitionKey + " .partition-size-info").text(partitionSizeMap[partitionKey] + " msgs");
+            $("#" + partitionKey + " .progress-bar.first").css("width", filledPerc + "%");
+            $("#" + partitionKey + " .progress-bar.second").css("width", freeSpacePerc + "%");
+        }
+    }
+
+
+
+
+    setInterval(getState, 500);
 
     var speedmax = 20000;
 

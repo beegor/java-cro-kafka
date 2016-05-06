@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.inova.javacro.kafka.core.JavaCroConsumer;
+import com.inova.javacro.kafka.core.JavaCroProducer;
 import com.inova.javacro.kafka.core.Topic;
 import com.inova.javacro.kafka.service.ConsumersManager;
 import com.inova.javacro.kafka.service.ProducersManager;
@@ -54,9 +55,13 @@ public class MainController {
 
     @RequestMapping(value = "/state", produces = "application/json")
     @ResponseBody
-    public Map<String, Map<String, Integer> >  getState() {
+    public Map<String, Map<String, Integer>>  getState() {
+        Map state = new HashMap<>();
+
         Map<String, Map<String, Integer>> speeds = getSpeedsMap();
-        return speeds;
+        state.put("speeds", speeds);
+        state.put("partitionSizes", getPartitionSizes());
+        return state;
     }
 
 
@@ -75,12 +80,24 @@ public class MainController {
         return speeds;
     }
 
+
+    private Map<String, Long> partitionSizes = new HashMap<>();
+
     public Map<String, Long> getPartitionSizes() {
 
-        Map<String, Long> partitionSizes = new HashMap<>();
         for (Topic topic : topicManager.getTopics()) {
             for (int partition = 0; partition < topic.getPartitionCount(); partition++) {
+                String partitionKey = topic.getTopicName() + "_" + partition;
 
+                long offset = partitionSizes.containsKey(partitionKey) ? partitionSizes.get(partitionKey) : 0;
+
+                for (JavaCroProducer producer : producersManager.getProducers().values()) {
+                    if (producer.getPartitionOffsets().containsKey(partitionKey)) {
+                        Long producerOffset = producer.getPartitionOffsets().get(partitionKey);
+                        if (producerOffset > offset) offset = producerOffset;
+                    }
+                }
+                partitionSizes.put(partitionKey, offset);
             }
         }
         return partitionSizes;
