@@ -38,6 +38,7 @@ public class JavaCroConsumer implements Runnable {
         Properties config = new Properties();
         config.put("client.id", id);
         config.put("group.id", group);
+        config.put("auto.offset.reset", "earliest");
         config.put("bootstrap.servers", "localhost:9092");
         config.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
         config.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
@@ -61,8 +62,11 @@ public class JavaCroConsumer implements Runnable {
         try {
             while (!shutdown.get()) {
                 ConsumerRecords<String, String> records = consumer.poll(1000);
-
                 updateSpeed(records);
+                Utils.sleep(10);
+                if (records.count() > 0) {
+                    log.debug("records fetched: " + records.count());
+                }
                 records.forEach(record -> process(record));
             }
         } finally {
@@ -72,6 +76,7 @@ public class JavaCroConsumer implements Runnable {
     }
 
     private void process(ConsumerRecord<String, String> record) {
+
 //        System.out.println(record.value());
     }
 
@@ -115,9 +120,11 @@ public class JavaCroConsumer implements Runnable {
         records.partitions().forEach(p -> {
             int partition = p.partition();
             long offset= consumer.position(p);
-            partitionOffsets.put(topic.getTopicName()+ "_" + group + "_" + partition, offset);
+            partitionOffsets.put(topic.getTopicName()+ "_" + partition, offset);
         });
+    }
 
-
+    public Map<String, Long> getPartitionOffsets() {
+        return partitionOffsets;
     }
 }

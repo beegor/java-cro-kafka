@@ -61,7 +61,7 @@
 
 
                 <div th:each="topic : ${topics}" >
-                    <div th:replace="fragments/topic :: topic(${topic}, ${partitionSizes})"></div>
+                    <div th:replace="fragments/topic :: topic(${topic}, ${partitionSizes}, ${partitionMaxSize}, ${consumerOffsets.get(topic.topicName)})"></div>
                 </div>
 
             </div>
@@ -215,6 +215,8 @@
                         data: "producerId=" + producerId + "&speedMsgPerSec=" + speed
                     });
                 });
+
+        $("[data-toggle='tooltip']").tooltip({trigger: 'manual'}).tooltip('show');
     });
 
 
@@ -339,6 +341,7 @@
                 speeds = data.speeds;
                 lastSpeedUpateTime = new Date().getTime();
                 updatePartitionSizes(data.partitionSizes);
+                updateConsumerOffsets(data.consumerOffsets);
             },
             error: function (xhr, ajaxOptions, thrownError) {
 //                alert(xhr.status);
@@ -353,7 +356,8 @@
         });
     }
 
-    var partitionMaxSize = 10000000;
+    var partitionMaxSize = [[${partitionMaxSize}]];
+
     function updatePartitionSizes(partitionSizeMap){
 
         for (var partitionKey in partitionSizeMap) {
@@ -366,6 +370,22 @@
         }
     }
 
+
+    function updateConsumerOffsets(topicOffsets){
+
+        for(var topic in topicOffsets){
+            var parititonOffsets = topicOffsets[topic];
+            for(var partition in parititonOffsets){
+                var consumerOffsets = parititonOffsets[partition];
+                for(var consumerId in consumerOffsets){
+                    var consumerOffset = consumerOffsets[consumerId];
+                    var selector = "#" + topic + "_" + partition + " .consumer-offsets-holder .consumer-" + consumerId + "-offset";
+                    var left = 100 * consumerOffset / partitionMaxSize + "%";
+                    $(selector).css("left", left);
+                }
+            }
+        }
+    }
 
 
 
@@ -420,6 +440,7 @@
 
 <script th:src="@{/bootstrap-3.3.6/js/bootstrap.min.js}"></script>
 <script th:src="@{/slider/js/bootstrap-slider.js}"></script>
+
 
 </body>
 </html>

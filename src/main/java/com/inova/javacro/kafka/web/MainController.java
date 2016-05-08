@@ -49,6 +49,8 @@ public class MainController {
         model.addAttribute("consumers", consumers);
         model.addAttribute("speeds", getSpeedsMap());
         model.addAttribute("partitionSizes", getPartitionSizes());
+        model.addAttribute("consumerOffsets", getConsumerOffsets());
+        model.addAttribute("partitionMaxSize", 10000000);
         return "main";
     }
 
@@ -61,6 +63,7 @@ public class MainController {
         Map<String, Map<String, Integer>> speeds = getSpeedsMap();
         state.put("speeds", speeds);
         state.put("partitionSizes", getPartitionSizes());
+        state.put("consumerOffsets", getConsumerOffsets());
         return state;
     }
 
@@ -80,6 +83,48 @@ public class MainController {
         return speeds;
     }
 
+
+    /**
+     *
+     * - topic
+     * --- partition
+     * ----- consumer-id
+     * ------- offset
+     */
+    private Map<String, Map<Integer, Map<String, Long>>> getConsumerOffsets()
+    {
+        Map<String, Map<Integer, Map<String, Long>>> topicOffsets = new HashMap<>();
+
+        for (Topic topic : topicManager.getTopics()) {
+
+            Map<Integer, Map<String, Long>> partitionOffsets = topicOffsets.get(topic.getTopicName());
+
+            if (partitionOffsets == null){
+                partitionOffsets = new HashMap<>();
+                topicOffsets.put(topic.getTopicName(), partitionOffsets);
+            }
+
+            for (int partition = 0; partition < topic.getPartitionCount(); partition++) {
+
+                Map<String, Long> consumerOffsets = partitionOffsets.get(partition);
+                if (consumerOffsets == null){
+                    consumerOffsets = new HashMap<>();
+                    partitionOffsets.put(partition, consumerOffsets);
+                }
+
+                String partitionKey = topic.getTopicName() + "_" + partition;
+
+                for (Map.Entry<String, JavaCroConsumer> entry : consumersManager.getConsumers().entrySet()) {
+                    String consumerId = entry.getKey();
+                    JavaCroConsumer consumer = entry.getValue();
+                    Long offset = consumer.getPartitionOffsets().get(partitionKey);
+                    if (offset != null)
+                        consumerOffsets.put(consumerId, offset);
+                }
+            }
+        }
+        return topicOffsets;
+    }
 
     private Map<String, Long> partitionSizes = new HashMap<>();
 
