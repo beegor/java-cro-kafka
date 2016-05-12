@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import java.util.*;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.stream.Collectors;
 
 public class JavaCroConsumer implements Runnable {
 
@@ -24,14 +25,17 @@ public class JavaCroConsumer implements Runnable {
 
     private final Logger log;
 
-    private Map<String, Long> partitionOffsets = new HashMap<>();
+    private Map<String, OffsetMark> partitionOffsets = new HashMap<>();
+
+    private long msgHandeDuration = 0;
 
 
-    public JavaCroConsumer(String id, Topic topic, String group) {
+    public JavaCroConsumer(String id, Topic topic, String group, Long msgHandeDuration) {
 
         this.topic = topic;
         this.group = group;
         this.id = id;
+        this.msgHandeDuration = msgHandeDuration;
 
         log = LoggerFactory.getLogger("CONSUMER-" + id);
 
@@ -62,8 +66,7 @@ public class JavaCroConsumer implements Runnable {
         try {
             while (!shutdown.get()) {
                 ConsumerRecords<String, String> records = consumer.poll(1000);
-                updateSpeed(records);
-                Utils.sleep(10);
+//                updateSpeed(records);
                 if (records.count() > 0) {
                     log.debug("records fetched: " + records.count());
                 }
@@ -76,8 +79,9 @@ public class JavaCroConsumer implements Runnable {
     }
 
     private void process(ConsumerRecord<String, String> record) {
-
-//        System.out.println(record.value());
+        partitionOffsets.put(record.topic() + "_" + record.partition(), new OffsetMark( System.currentTimeMillis(), record.offset()));
+        Utils.sleep(msgHandeDuration);
+        updateSpeed();
     }
 
 
@@ -110,21 +114,35 @@ public class JavaCroConsumer implements Runnable {
 
     private Map<Integer, Integer> speedPerSecond = new LinkedHashMap<>();
 
-    private void updateSpeed(ConsumerRecords<String, String> records) {
+    private void updateSpeed() {
 
         int currentSecond = (int) (System.currentTimeMillis() / 1000);
         int currentSecondMsgCount = speedPerSecond.containsKey(currentSecond) ? speedPerSecond.get(currentSecond) : 0;
-        currentSecondMsgCount += records.count();
+        currentSecondMsgCount += 1;
         speedPerSecond.put(currentSecond, currentSecondMsgCount);
 
-        records.partitions().forEach(p -> {
-            int partition = p.partition();
-            long offset= consumer.position(p);
-            partitionOffsets.put(topic.getTopicName()+ "_" + partition, offset);
-        });
+
+//        partitionOffsets.put(topic.getTopicName()+ "_" + records.p, offset);
+//        records.partitions().forEach(p -> {
+//            int partition = p.partition();
+//            long offset= consumer.position(p);
+//            partitionOffsets.put(topic.getTopicName()+ "_" + partition, offset);
+//        });
     }
 
     public Map<String, Long> getPartitionOffsets() {
-        return partitionOffsets;
+        partitionOffsets.entrySet().removeIf( e -> e.getValue().time < System.currentTimeMillis() - 500);
+        return partitionOffsets.entrySet().stream().collect(Collectors.toMap(e -> e.getKey(),
+                e -> e.getValue().offset));
+    }
+
+    private class OffsetMark {
+        private long time = 0;
+        private long offset = 0;
+
+        public OffsetMark(long time, long offset) {
+            this.time = time;
+            this.offset = offset;
+        }
     }
 }

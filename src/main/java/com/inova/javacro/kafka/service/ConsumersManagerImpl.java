@@ -14,12 +14,14 @@ import java.util.Map;
 @Service
 public class ConsumersManagerImpl implements ConsumersManager {
 
+    private static int nextConsumerId = 1;
+
     private Map<String, JavaCroConsumer> consumers = new LinkedHashMap<>();
 
     @Override
-    public String addConsumer(Topic topic, String group) {
-        String consumerId =  LocalTime.now().toSecondOfDay() + "";
-        consumers.put(consumerId, new JavaCroConsumer(consumerId, topic, group));
+    public String addConsumer(Topic topic, String group, Long msgProcDur) {
+        String consumerId =  "" + nextConsumerId++;
+        consumers.put(consumerId, new JavaCroConsumer(consumerId, topic, group, msgProcDur));
         return consumerId;
     }
 

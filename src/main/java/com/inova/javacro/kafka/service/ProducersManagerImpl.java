@@ -16,9 +16,12 @@ public class ProducersManagerImpl implements ProducersManager {
 
     private Map<String, JavaCroProducer> producers = new LinkedHashMap<>();
 
+    private static int nextProducerId = 1;
+
+
     @Override
     public String addProducer(Topic topic) {
-        String producerId = LocalTime.now().toSecondOfDay() + "";
+        String producerId = "" + nextProducerId++ ;
         producers.put(producerId, new JavaCroProducer(producerId, topic));
         return producerId;
     }

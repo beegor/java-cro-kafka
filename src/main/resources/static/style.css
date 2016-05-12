@@ -128,14 +128,12 @@ body{
     height: 20px;
 }
 .consumer-offset {
-    /*width: 30px;*/
+    width: 30px;
     /*height: 20px;*/
-    /*position: absolute;*/
+    position: absolute;
     /*background:black;*/
     /*color: white;*/
-    /*left: 40%;*/
-    /*top:-40px;*/
-    /*z-index: 1000;*/
-    /*margin-left: -15px;*/
+    top:-52px;
+    margin-left: -15px;
     opacity:1 !important;
 }

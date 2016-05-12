@@ -118,7 +118,7 @@ public class MainController {
                     String consumerId = entry.getKey();
                     JavaCroConsumer consumer = entry.getValue();
                     Long offset = consumer.getPartitionOffsets().get(partitionKey);
-                    if (offset != null)
+                    if (offset != null &&  (!consumerOffsets.containsKey(consumerId) || consumerOffsets.get(consumerId) < offset))
                         consumerOffsets.put(consumerId, offset);
                 }
             }

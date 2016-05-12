@@ -7,7 +7,7 @@ import java.util.Map;
 
 public interface ConsumersManager {
 
-    String addConsumer(Topic topic, String consumerGroup);
+    String addConsumer(Topic topic, String consumerGroup, Long msgProcDur);
 
     void destroyConsumer(String producerId);
 

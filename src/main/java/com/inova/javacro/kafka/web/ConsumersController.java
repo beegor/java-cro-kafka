@@ -24,11 +24,12 @@ public class ConsumersController {
 
     @ResponseBody
     @RequestMapping("/add")
-    public String add(@RequestParam String topicName, @RequestParam String group) {
+    public String add(@RequestParam String topicName, @RequestParam String group, @RequestParam String msgProcDur) {
         try {
             Topic topic = topicManager.getTopic(topicName);
             if (topic != null) {
-                String consumerId = consumersManager.addConsumer(topic, group);
+                Long msgHandleDur = stirngToLong(msgProcDur, 0L);
+                String consumerId = consumersManager.addConsumer(topic, group, msgHandleDur);
                 return "Consumer successfully added: " + consumerId;
             } else {
                 return "ERROR: No such topic: " + topicName;
@@ -48,6 +49,14 @@ public class ConsumersController {
             return "Consumer successfully deleted";
         } catch (Exception e) {
             return "ERROR: " + e.getMessage();
+        }
+    }
+
+    private Long stirngToLong(String longStr, Long fallback){
+        try {
+            return Long.parseLong(longStr);
+        } catch (Exception e) {
+            return fallback;
         }
     }
 
