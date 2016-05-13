@@ -367,7 +367,17 @@
 
     function updatePartitionSizes(partitionSizeMap){
 
+        var topicMaxPartitionSizes = {};
         for (var partitionKey in partitionSizeMap) {
+            var topicKey = partitionKey.substring(0, partitionKey.lastIndexOf("_"));
+            var pSize = partitionSizeMap[partitionKey] / 1000000 + 1;
+            if(!topicMaxPartitionSizes[topicKey] || topicMaxPartitionSizes[topicKey] < pSize )
+                topicMaxPartitionSizes[topicKey] = pSize;
+        }
+
+        for (var partitionKey in partitionSizeMap) {
+
+            var partitionMaxSize = topicMaxPartitionSizes[partitionKey.substring(0, partitionKey.lastIndexOf("_"))];
             var filledPerc =  100 * partitionSizeMap[partitionKey] / partitionMaxSize;
             filledPerc = Math.min(100, filledPerc);
             var freeSpacePerc = 100 - filledPerc;

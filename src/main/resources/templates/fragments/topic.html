@@ -5,51 +5,34 @@
 
 <!--/*@thymesVar id="topic" type="com.inova.javacro.kafka.core.Topic"*/-->
 <!--/*@thymesVar id="partitionSizes" type="java.util.Map<java.lang.String, java.lang.Long>"*/-->
-<div th:fragment="topic(topic, partitionSizes, partitionMaxSize, consumerOffsets)" class="topic" th:style="|border-color: ${topic.topicColorHex}|">
+<div th:fragment="topic(topic, partitionSizes, consumerOffsets)" class="topic" th:style="|border-color: ${topic.topicColorHex}|">
+
     <button class="delete-topic pull-right" th:attr="data-topic-name=${topic.topicName}">X</button>
-
     <h2 th:text="${topic.topicName}"></h2>
-    <!--<p> partitions: <span th:text="${topic.getPartitionCount()}"></span></p>-->
-    <!--<div th:each="i : ${#numbers.sequence(1,topic.partitionCount)}"-->
-         <!--class="partition" th:id="${topic.topicName + '_' + (i - 1)}"-->
-         <!--th:style="|background-color: ${topic.topicColorHex}|"-->
-         <!--th:text="${ partitionSizes.get(topic.topicName + '_' + (i - 1))}"-->
-    <!--&gt;-->
-
-        <div class="progress partition" th:each="i : ${#numbers.sequence(1,topic.partitionCount)}" th:id="${topic.topicName + '_' + (i - 1)}"
-             th:with="ps=${partitionSizes.get(topic.topicName + '_' + (i - 1))}">
 
 
-            <div class="progress-bar first" th:style="|background-color: ${topic.topicColorHex}; width: ${ 100 * ps/partitionMaxSize + '%'}|">
-                <span class="sr-only">35% Complete (success)</span>
-            </div>
+    <div class="progress partition" th:each="i : ${#numbers.sequence(1,topic.partitionCount)}" th:id="${topic.topicName + '_' + (i - 1)}"
+         th:with="ps=${partitionSizes.get(topic.topicName + '_' + (i - 1))}">
 
-            <div class="progress-bar second" th:style="|background-color: ${topic.topicColorHex}; width: ${100 - 100 * ps/partitionMaxSize + '%'};opacity:${0.6}|">
-                <span class="sr-only">35% Complete (success)</span>
-            </div>
-
-            <div class="partition-size-info" th:text="|${ps} msg|" style="height: 20px; position: relative; color: white; left: 0%; top:-20px;"></div>
-
-            <div class="consumer-offsets-holder" style="position: relative" th:with="partitionOffsets=${consumerOffsets.get(i - 1)}">
-                <div th:each=" cOff : ${partitionOffsets}" class="tooltip top consumer-offset" th:classappend="'consumer-'+ ${cOff.key} +'-offset'"
-                      th:style="'left: ' + ${100 * cOff.value / partitionMaxSize } + '%;'">
-                    <div class="tooltip-arrow"></div>
-                    <div class="tooltip-inner" th:text="${'C' + cOff.key}" ></div>
-                <!--data-title="C1" data-trigger="manual"  data-toggle="tooltip" data-placement="top"-->
-
-
-
-                </div>
-
-
-
-            </div>
-
-
-
+        <div class="progress-bar first" th:style="|background-color: ${topic.topicColorHex}; width: ${ 100 * ps/partitionMaxSize + '%'}|">
+            <span class="sr-only">35% Complete (success)</span>
         </div>
 
+        <div class="progress-bar second" th:style="|background-color: ${topic.topicColorHex}; width: ${100 - 100 * ps/partitionMaxSize + '%'};opacity:${0.6}|">
+            <span class="sr-only">35% Complete (success)</span>
+        </div>
 
+        <div class="partition-size-info" th:text="|${ps} msg|" style="height: 20px; position: relative; color: white; left: 0%; top:-20px;"></div>
+
+        <div class="consumer-offsets-holder" style="position: relative" th:with="partitionOffsets=${consumerOffsets.get(i - 1)}">
+            <div th:each=" cOff : ${partitionOffsets}" class="tooltip top consumer-offset" th:classappend="'consumer-'+ ${cOff.key} +'-offset'"
+                  th:style="'left: ' + ${100 * cOff.value / partitionMaxSize } + '%;'">
+                <div class="tooltip-arrow"></div>
+                <div class="tooltip-inner" th:text="${'C' + cOff.key}" ></div>
+            </div>
+
+        </div>
+    </div>
 
 </div>
 
