@@ -61,7 +61,7 @@
 
 
                 <div th:each="topic : ${topics}" >
-                    <div th:replace="fragments/topic :: topic(${topic}, ${partitionSizes}, ${partitionMaxSize}, ${consumerOffsets.get(topic.topicName)})"></div>
+                    <div th:replace="fragments/topic :: topic(${topic}, ${partitionSizes}, ${consumerOffsets.get(topic.topicName)})"></div>
                 </div>
 
             </div>
@@ -347,8 +347,10 @@
             success: function (data) {
                 speeds = data.speeds;
                 lastSpeedUpateTime = new Date().getTime();
-                updatePartitionSizes(data.partitionSizes);
-                updateConsumerOffsets(data.consumerOffsets);
+
+                var topicMaxPartitionSizes = getTopicMaxPartSizes(data.partitionSizes);
+                updatePartitionSizes(data.partitionSizes, topicMaxPartitionSizes);
+                updateConsumerOffsets(data.consumerOffsets, topicMaxPartitionSizes);
             },
             error: function (xhr, ajaxOptions, thrownError) {
 //                alert(xhr.status);
@@ -365,22 +367,26 @@
 
     var partitionMaxSize = [[${partitionMaxSize}]];
 
-    function updatePartitionSizes(partitionSizeMap){
-
+    function getTopicMaxPartSizes(partitionSizeMap) {
         var topicMaxPartitionSizes = {};
         for (var partitionKey in partitionSizeMap) {
             var topicKey = partitionKey.substring(0, partitionKey.lastIndexOf("_"));
-            var pSize = partitionSizeMap[partitionKey] / 1000000 + 1;
-            if(!topicMaxPartitionSizes[topicKey] || topicMaxPartitionSizes[topicKey] < pSize )
+            var pSize = (Math.floor(partitionSizeMap[partitionKey] / 1000000) + 1) * 1000000;
+            if (!topicMaxPartitionSizes[topicKey] || topicMaxPartitionSizes[topicKey] < pSize)
                 topicMaxPartitionSizes[topicKey] = pSize;
         }
+        return topicMaxPartitionSizes;
+    }
+    function updatePartitionSizes(partitionSizeMap, topicMaxPartitionSizes){
 
         for (var partitionKey in partitionSizeMap) {
 
             var partitionMaxSize = topicMaxPartitionSizes[partitionKey.substring(0, partitionKey.lastIndexOf("_"))];
+
             var filledPerc =  100 * partitionSizeMap[partitionKey] / partitionMaxSize;
             filledPerc = Math.min(100, filledPerc);
             var freeSpacePerc = 100 - filledPerc;
+            $("#" + partitionKey + " .partition-max-size").text((partitionMaxSize/1000000) + " M");
             $("#" + partitionKey + " .partition-size-info").text(partitionSizeMap[partitionKey] + " msg");
             $("#" + partitionKey + " .progress-bar.first").css("width", filledPerc + "%");
             $("#" + partitionKey + " .progress-bar.second").css("width", freeSpacePerc + "%");
@@ -388,15 +394,17 @@
     }
 
 
-    function updateConsumerOffsets(topicOffsets){
+    function updateConsumerOffsets(topicOffsets, topicMaxPartitionSizes){
 
         for(var topic in topicOffsets){
             var parititonOffsets = topicOffsets[topic];
             for(var partition in parititonOffsets){
+                var partitionKey = topic + "_" + partition;
+                var partitionMaxSize = topicMaxPartitionSizes[partitionKey.substring(0, partitionKey.lastIndexOf("_"))];
                 var consumerOffsets = parititonOffsets[partition];
                 for(var consumerId in consumerOffsets){
                     var consumerOffset = consumerOffsets[consumerId];
-                    var selector = "#" + topic + "_" + partition + " .consumer-offsets-holder .consumer-" + consumerId + "-offset";
+                    var selector = "#" + partitionKey + " .consumer-offsets-holder .consumer-" + consumerId + "-offset";
                     var left = 100 * consumerOffset / partitionMaxSize + "%";
                     $(selector).css("left", left);
                 }

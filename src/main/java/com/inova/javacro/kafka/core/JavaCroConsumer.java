@@ -103,8 +103,6 @@ public class JavaCroConsumer implements Runnable {
 
 
 
-
-
     public synchronized int getSpeedMsgPerSec() {
         int pastSecond = (int) ( System.currentTimeMillis() / 1000) - 1;
         int msgsInPastSecond =  speedPerSecond.containsKey(pastSecond) ? speedPerSecond.get(pastSecond) : 0;

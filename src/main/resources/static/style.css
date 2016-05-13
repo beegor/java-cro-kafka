@@ -67,6 +67,25 @@ body{
     background-image: none !important;
 }
 
+
+.partition-size-info {
+    height: 20px;
+    color: white;
+    padding-left: 5px;
+    text-shadow: -1px 0 black, 0 1px black,
+    1px 0 black, 0 -1px black
+
+}
+
+.partition-max-size {
+    float: right;
+    height: 20px;
+    color: white;
+    padding-right: 5px;
+    text-shadow: -1px 0 black, 0 1px black,
+    1px 0 black, 0 -1px black
+}
+
 .producer, .consumer {
     border: solid 1px;
     border-radius: 20px;
@@ -131,11 +150,8 @@ body{
 
 .consumer-offset {
     width: 30px;
-    /*height: 20px;*/
     position: absolute;
-    /*background:black;*/
-    /*color: white;*/
-    top:-52px;
+    top:-72px;
     margin-left: -15px;
-    opacity:0.5 !important;
+    opacity:0.7 !important;
 }
