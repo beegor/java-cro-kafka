@@ -116,7 +116,7 @@ body{
     display: block;
 }
 
-.consumer-group h2, .consumer-group h3{
+.consumer-group h2, .consumer-group h3 {
     margin: 0px;
 }
 
@@ -127,6 +127,8 @@ body{
 .consumer-offsets-holder{
     height: 20px;
 }
+
+
 .consumer-offset {
     width: 30px;
     /*height: 20px;*/
