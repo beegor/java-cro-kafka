@@ -48,9 +48,10 @@ public class MainController {
         });
         model.addAttribute("consumers", consumers);
         model.addAttribute("speeds", getSpeedsMap());
-        model.addAttribute("partitionSizes", getPartitionSizes());
+        Map<String, Long> partitionSizes = getPartitionSizes();
+        model.addAttribute("partitionSizes", partitionSizes);
         model.addAttribute("consumerOffsets", getConsumerOffsets());
-        model.addAttribute("partitionMaxSize", 10000000);
+        model.addAttribute("topicMaxPartitionSizes", getTopicMaxPartitionSizes(partitionSizes));
         return "main";
     }
 
@@ -147,4 +148,19 @@ public class MainController {
         }
         return partitionSizes;
     }
+
+    public Map<String, Long> getTopicMaxPartitionSizes(Map<String, Long> partitionSizes) {
+
+        Map<String, Long> maxSizes = new HashMap<>();
+
+        for (Map.Entry<String, Long> entry : partitionSizes.entrySet()) {
+            String partitionKey = entry.getKey();
+            String topicKey = partitionKey.substring(0, partitionKey.lastIndexOf("_"));
+            long pSize = (partitionSizes.get(partitionKey) / 1000000L  + 1L) * 1000000L;
+            if( !maxSizes.containsValue(topicKey) || maxSizes.get(topicKey) < pSize)
+                maxSizes.put(topicKey, pSize);
+        }
+        return maxSizes;
+    }
+
 }

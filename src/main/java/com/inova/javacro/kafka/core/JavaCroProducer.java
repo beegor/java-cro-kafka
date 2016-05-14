@@ -104,16 +104,9 @@ public class JavaCroProducer {
 
     private Callback msgSendListener = new Callback() {
 
-        private long lastLogTime = 0;
-
         @Override
         public void onCompletion(RecordMetadata data, Exception exception) {
             partitionOffsets.put(topic.getTopicName() + "_" + data.partition(), data.offset());
-            if (System.currentTimeMillis() - lastLogTime > 1000) {
-                log.debug("Offset for partition {} : {}", data.partition(), data.offset());
-                lastLogTime = System.currentTimeMillis();
-
-            }
         }
     };
 }

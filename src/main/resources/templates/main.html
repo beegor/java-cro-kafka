@@ -61,7 +61,7 @@
 
 
                 <div th:each="topic : ${topics}" >
-                    <div th:replace="fragments/topic :: topic(${topic}, ${partitionSizes}, ${consumerOffsets.get(topic.topicName)})"></div>
+                    <div th:replace="fragments/topic :: topic(${topic}, ${partitionSizes}, ${topicMaxPartitionSizes.get(topic.topicName)}, ${consumerOffsets.get(topic.topicName)})"></div>
                 </div>
 
             </div>
@@ -171,8 +171,8 @@
                 <div class="modal-body">
 
                     <div class="form-group">
-                        <label for="consumerTopic" class="col-sm-2 control-label">Topic</label>
-                        <div class="col-sm-10">
+                        <label for="consumerTopic" class="col-sm-6 control-label">Topic</label>
+                        <div class="col-sm-6">
                             <select name="topicName" class="form-control" id="consumerTopic">
                                 <option th:each="topic : ${topics}" th:value="${topic.topicName}" th:text="${topic.topicName}"></option>
                             </select>
@@ -180,15 +180,15 @@
                     </div>
 
                     <div class="form-group">
-                        <label  class="col-sm-2 control-label">Topic</label>
-                        <div class="col-sm-10">
+                        <label  class="col-sm-6 control-label">Group</label>
+                        <div class="col-sm-6">
                             <input type="text" class="form-control" name="group" placeholder="group name"/>
                         </div>
                     </div>
 
                     <div class="form-group">
-                        <label  class="col-sm-2 control-label">Single msg processing duration</label>
-                        <div class="col-sm-10">
+                        <label  class="col-sm-6 control-label">Single msg processing duration</label>
+                        <div class="col-sm-6">
                             <input type="text" class="form-control" name="msgProcDur" value="0"/>
                         </div>
                     </div>
@@ -377,6 +377,8 @@
         }
         return topicMaxPartitionSizes;
     }
+
+
     function updatePartitionSizes(partitionSizeMap, topicMaxPartitionSizes){
 
         for (var partitionKey in partitionSizeMap) {
@@ -402,12 +404,33 @@
                 var partitionKey = topic + "_" + partition;
                 var partitionMaxSize = topicMaxPartitionSizes[partitionKey.substring(0, partitionKey.lastIndexOf("_"))];
                 var consumerOffsets = parititonOffsets[partition];
+
                 for(var consumerId in consumerOffsets){
                     var consumerOffset = consumerOffsets[consumerId];
-                    var selector = "#" + partitionKey + " .consumer-offsets-holder .consumer-" + consumerId + "-offset";
                     var left = 100 * consumerOffset / partitionMaxSize + "%";
-                    $(selector).css("left", left);
+
+                    var selector = "#" + partitionKey + " .consumer-offsets-holder .consumer-" + consumerId + "-offset";
+                    if( $( selector ).length) {
+                        $(selector).css("left", left);
+                    }
+                    else {
+                        var elHTML = '<div class="tooltip top consumer-offset consumer-'+ consumerId +'-offset" style="left: ' + left + '">' +
+                                '<div class="tooltip-arrow"></div>' +
+                                '<div class="tooltip-inner">C' + consumerId + ' </div>' +
+                                '</div>';
+
+                        $("#" + partitionKey + " .consumer-offsets-holder").append(elHTML);
+                    }
                 }
+
+                // remove c
+                $("#" + partitionKey + " .consumer-offsets-holder").children('.consumer-offset').each(function(i) {
+                    var oCId = parseInt($(this).find(".tooltip-inner").text().substring(1));
+                    if(consumerOffsets[oCId] === undefined){
+                        $(this).remove();
+                    }
+
+                });
             }
         }
     }

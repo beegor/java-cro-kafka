@@ -66,10 +66,6 @@ public class JavaCroConsumer implements Runnable {
         try {
             while (!shutdown.get()) {
                 ConsumerRecords<String, String> records = consumer.poll(1000);
-//                updateSpeed(records);
-                if (records.count() > 0) {
-                    log.debug("records fetched: " + records.count());
-                }
                 records.forEach(record -> process(record));
             }
         } finally {
