@@ -4,7 +4,9 @@
 
 
 <!--/*@thymesVar id="consumer" type="com.inova.javacro.kafka.core.JavaCroConsumer"*/-->
-    <div th:fragment="consumer(consumerId, consumer)" th:id="'consumer-' + ${consumerId}" class="consumer"  th:attr="data-target-speed=${consumer.speedMsgPerSec}, data-current-speed=${consumer.speedMsgPerSec}">
+    <div th:fragment="consumer(consumerId, consumer)" th:id="'consumer-' + ${consumerId}" class="consumer"
+         th:attr="data-target-speed=${consumer.speedMsgPerSec}, data-current-speed=${consumer.speedMsgPerSec}, data-msg-proc-dur=${consumer.msgProcessDuration}, data-topic=${consumer.topic.topicName}">
+
         <button class="btn btn-danger delete-consumer pull-right" th:attr="data-consumer-id=${consumerId}">X</button>
         <h2 th:text="|C ${consumerId}|" th:style="|background-color: ${consumer.topic.topicColorHex}|"></h2>
 
@@ -12,13 +14,11 @@
             <div class="gears">
                 <i></i>
             </div>
-            <span class="speed-info"></span>
+            <span class="speed-info"></span><br/>
+            <button type="button" class="btn" th:onclick="'showConsumerForm(__${consumerId}__)'"><i class="glyphicon glyphicon-edit"></i></button>
             <div style="clear: both"></div>
         </div>
-
     </div>
-
-
 
 </body>
 </html>

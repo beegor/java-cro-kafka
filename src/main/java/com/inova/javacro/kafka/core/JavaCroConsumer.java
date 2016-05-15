@@ -20,22 +20,23 @@ public class JavaCroConsumer implements Runnable {
     private final AtomicBoolean shutdown;
     private final CountDownLatch shutdownLatch;
     private final String group;
-    private final Topic topic;
     private final String id;
+    private Topic topic;
 
     private final Logger log;
 
     private Map<String, OffsetMark> partitionOffsets = new HashMap<>();
 
-    private long msgHandeDuration = 0;
+    // this is in micro seconds
+    private long msgProcessDuration = 0;
 
 
-    public JavaCroConsumer(String id, Topic topic, String group, Long msgHandeDuration) {
+    public JavaCroConsumer(String id, Topic topic, String group, Long msgProcessDuration) {
 
         this.topic = topic;
         this.group = group;
         this.id = id;
-        this.msgHandeDuration = msgHandeDuration;
+        this.msgProcessDuration = msgProcessDuration;
 
         log = LoggerFactory.getLogger("CONSUMER-" + id);
 
@@ -48,10 +49,7 @@ public class JavaCroConsumer implements Runnable {
         config.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
 
         consumer = new KafkaConsumer(config);
-
-        List<String> topics = new ArrayList<>();
-        topics.add(topic.getTopicName());
-        consumer.subscribe(topics);
+        consumer.subscribe( Arrays.asList(new String[]{topic.getTopicName()}));
 
         this.shutdown = new AtomicBoolean(false);
         this.shutdownLatch = new CountDownLatch(1);
@@ -66,7 +64,7 @@ public class JavaCroConsumer implements Runnable {
         try {
             while (!shutdown.get()) {
                 ConsumerRecords<String, String> records = consumer.poll(1000);
-                records.forEach(record -> process(record));
+                records.forEach(record -> processMessage(record));
             }
         } finally {
             consumer.close();
@@ -74,11 +72,24 @@ public class JavaCroConsumer implements Runnable {
         }
     }
 
-    private void process(ConsumerRecord<String, String> record) {
+
+    private void processMessage(ConsumerRecord<String, String> record) {
+
         partitionOffsets.put(record.topic() + "_" + record.partition(), new OffsetMark( System.currentTimeMillis(), record.offset()));
-        Utils.sleep(msgHandeDuration);
+
+        if (msgProcessDuration > 0) {
+            long milis = msgProcessDuration / 1000;
+            int nanos = (int) (msgProcessDuration % 1000);
+            Utils.sleep(milis, nanos);
+        }
         updateSpeed();
     }
+
+
+
+
+
+
 
 
     public void stop(){
@@ -97,7 +108,15 @@ public class JavaCroConsumer implements Runnable {
         return id;
     }
 
+    public long getMsgProcessDuration() {
+        return msgProcessDuration;
+    }
 
+    public void setMsgProcessDuration(long msgProcessDuration) {
+        this.msgProcessDuration = msgProcessDuration;
+    }
+
+    private Map<Integer, Integer> speedPerSecond = new LinkedHashMap<>();
 
     public synchronized int getSpeedMsgPerSec() {
         int pastSecond = (int) ( System.currentTimeMillis() / 1000) - 1;
@@ -106,22 +125,12 @@ public class JavaCroConsumer implements Runnable {
         return msgsInPastSecond;
     }
 
-    private Map<Integer, Integer> speedPerSecond = new LinkedHashMap<>();
-
     private void updateSpeed() {
 
         int currentSecond = (int) (System.currentTimeMillis() / 1000);
         int currentSecondMsgCount = speedPerSecond.containsKey(currentSecond) ? speedPerSecond.get(currentSecond) : 0;
         currentSecondMsgCount += 1;
         speedPerSecond.put(currentSecond, currentSecondMsgCount);
-
-
-//        partitionOffsets.put(topic.getTopicName()+ "_" + records.p, offset);
-//        records.partitions().forEach(p -> {
-//            int partition = p.partition();
-//            long offset= consumer.position(p);
-//            partitionOffsets.put(topic.getTopicName()+ "_" + partition, offset);
-//        });
     }
 
     public Map<String, Long> getPartitionOffsets() {

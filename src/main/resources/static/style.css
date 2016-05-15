@@ -114,6 +114,16 @@ body{
     margin: 1px 1px 0px 0px;
 }
 
+
+.slider.slider-horizontal {
+    width: 100% !important;
+}
+
+#addConsumerModal .slider.slider-horizontal {
+    height: 40px !important;
+}
+
+
 .producer .slider-selection {
     background: #FF8282;
 }
@@ -156,3 +166,11 @@ body{
     opacity:0.7 !important;
     z-index: 500 !important;
 }
+
+.progress-bar {
+    -webkit-transition: none;
+    -moz-transition: none;
+    -ms-transition: none;
+    -o-transition: none;
+    transition: none;
+}​

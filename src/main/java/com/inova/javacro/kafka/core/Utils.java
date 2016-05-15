@@ -1,14 +1,16 @@
 package com.inova.javacro.kafka.core;
 
-/**
- * Created by bigor on 04.04.16..
- */
+
 public class Utils {
 
 
     public static  void sleep(long howLongMS) {
+        Utils.sleep(howLongMS, 0);
+    }
+
+    public static  void sleep(long howLongMS, int howLongNanos) {
         try {
-            Thread.sleep(howLongMS, 0);
+            Thread.sleep(howLongMS, howLongNanos);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }

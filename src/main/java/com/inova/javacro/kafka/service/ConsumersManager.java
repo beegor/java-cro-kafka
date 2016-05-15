@@ -9,6 +9,8 @@ public interface ConsumersManager {
 
     String addConsumer(Topic topic, String consumerGroup, Long msgProcDur);
 
+    void updateConsumerMsgProcDuration(String consumerId, Long msgProcDur);
+
     void destroyConsumer(String producerId);
 
     Map<String, JavaCroConsumer> getConsumers();

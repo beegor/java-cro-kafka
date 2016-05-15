@@ -72,7 +72,7 @@
             <div class="box">
 
                 <div class="titlebar">
-                    <button type="button" class="btn btn-primary btn-sm pull-right" data-toggle="modal" data-target="#addConsumerModal">
+                    <button type="button" class="btn btn-primary btn-sm pull-right" onclick="showConsumerForm(0)">
                         Add consumer
                     </button>
                     <h1>CONSUMERS</h1>
@@ -84,14 +84,9 @@
                     <div th:each="con : ${entry.value}" >
                         <div th:replace="fragments/consumer :: consumer(${con.id}, ${con})"></div>
                     </div>
-
                 </div>
-
             </div>
-
-
         </div>
-
     </div>
 </div>
 
@@ -107,14 +102,15 @@
                 <div class="modal-body">
 
                     <div class="form-group">
-                        <label for="topicName" class="col-sm-2 control-label">Topic name</label>
-                        <div class="col-sm-10">
+                        <label for="topicName" class="col-sm-6 control-label">Topic name</label>
+                        <div class="col-sm-6">
                             <input type="text" class="form-control" id="topicName" name="topicName" placeholder="TOPIC_NAME"/>
                         </div>
                     </div>
+
                     <div class="form-group">
-                        <label for="partitionCount" class="col-sm-2 control-label">Partition count</label>
-                        <div class="col-sm-10">
+                        <label for="partitionCount" class="col-sm-6 control-label">Partition count</label>
+                        <div class="col-sm-6">
                             <input type="number" class="form-control" name="partitionCount" id="partitionCount" value="1"/>
                         </div>
                     </div>
@@ -141,8 +137,8 @@
                 <div class="modal-body">
 
                     <div class="form-group">
-                        <label for="producerTopic" class="col-sm-2 control-label">Topic</label>
-                        <div class="col-sm-10">
+                        <label for="producerTopic" class="col-sm-6 control-label">Topic</label>
+                        <div class="col-sm-6">
                             <select name="topicName" class="form-control" id="producerTopic">
                                 <option th:each="topic : ${topics}" th:value="${topic.topicName}" th:text="${topic.topicName}"></option>
                             </select>
@@ -163,14 +159,14 @@
 <div id="addConsumerModal" class="modal fade" tabindex="-1" role="dialog">
     <div class="modal-dialog">
         <div class="modal-content">
-            <form th:action="@{/consumer/add}" class="form-horizontal" id="add-consumer-form">
+            <form th:action="@{/consumer/save}" class="form-horizontal" id="save-consumer-form">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
                     <h4 class="modal-title">Create consumer</h4>
                 </div>
                 <div class="modal-body">
 
-                    <div class="form-group">
+                    <div class="form-group consumer-topic-input">
                         <label for="consumerTopic" class="col-sm-6 control-label">Topic</label>
                         <div class="col-sm-6">
                             <select name="topicName" class="form-control" id="consumerTopic">
@@ -179,24 +175,30 @@
                         </div>
                     </div>
 
-                    <div class="form-group">
+                    <div class="form-group consumer-group-input">
                         <label  class="col-sm-6 control-label">Group</label>
                         <div class="col-sm-6">
                             <input type="text" class="form-control" name="group" placeholder="group name"/>
                         </div>
                     </div>
 
-                    <div class="form-group">
-                        <label  class="col-sm-6 control-label">Single msg processing duration</label>
+                    <div class="form-group consumer-msgProcDur-input">
+                        <label  class="col-sm-6 control-label">Single msg processing duration (μs)</label>
                         <div class="col-sm-6">
-                            <input type="text" class="form-control" name="msgProcDur" value="0"/>
+
+                            <input type="text" class="speed-slider" name="msgProcDur" value="" style="width: 100% !important; height: 40px !important;"
+                                   data-slider-min="0" data-slider-max="1000" data-slider-step="10" data-slider-value="0"
+                                   data-slider-tooltip="show" data-slider-orientation="horizontal" data-slider-selection="before"/>
                         </div>
                     </div>
 
+                    <input type="hidden" name="consumerId" value="0"/>
+
                 </div>
+
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-primary">Create</button>
+                    <button type="submit" class="submit-btn btn btn-primary">Create</button>
                 </div>
             </form>
         </div><!-- /.modal-content -->
@@ -208,129 +210,6 @@
     // <![CDATA[
 
 
-    $(function() {
-
-        $('.producer .speed-slider').slider()
-                .on('slide', function(ev){
-                    var producerId = $(this).closest(".producer").attr("data-producer-id");
-                    var speed = $(this).val();
-
-                    var url = [[@{/producer/update-speed}]] ;
-                    $.ajax({
-                        type: "POST",
-                        url: url,
-                        data: "producerId=" + producerId + "&speedMsgPerSec=" + speed
-                    });
-                });
-
-        $("[data-toggle='tooltip']").tooltip({trigger: 'manual'}).tooltip('show');
-    });
-
-
-
-
-    $("#add-topic-form").submit(function (e) {
-
-        var url = $(this).attr("action");
-        $.ajax({
-            type: "POST",
-            url: url,
-            data: $("#add-topic-form").serialize(), // serializes the form's elements.
-            success: function (data) {
-                location.reload();
-            }
-        });
-
-        e.preventDefault(); // avoid to execute the actual submit of the form.
-    });
-
-
-
-    $("#add-producer-form").submit(function (e) {
-
-        var url = $(this).attr("action");
-        $.ajax({
-            type: "POST",
-            url: url,
-            data: $(this).serialize(), // serializes the form's elements.
-            success: function (data) {
-                location.reload();
-            }
-        });
-        e.preventDefault(); // avoid to execute the actual submit of the form.
-    });
-
-
-
-    $("#add-consumer-form").submit(function (e) {
-
-        var url = $(this).attr("action");
-
-        $.ajax({
-            type: "POST",
-            url: url,
-            data: $(this).serialize(), // serializes the form's elements.
-            success: function (data) {
-                location.reload();
-            }
-        });
-
-        e.preventDefault(); // avoid to execute the actual submit of the form.
-    });
-
-    $(".delete-topic").on("click", function (ev) {
-
-        var url = [[@{/topic/delete}]];
-        var topicName = $(this).attr("data-topic-name");
-
-        $.ajax({
-            type: "POST",
-            url: url,
-            data: "topicName=" + topicName, // serializes the form's elements.
-            success: function (data) {
-                location.reload();
-            }
-        });
-
-        ev.preventDefault();
-
-    });
-
-    $(".delete-producer").on("click", function (ev) {
-
-        var url = [[@{/producer/delete}]] ;
-        var producerId = $(this).closest("div").attr("data-producer-id");
-
-        $.ajax({
-            type: "POST",
-            url: url,
-            data: "producerId=" + producerId, // serializes the form's elements.
-            success: function (data) {
-                location.reload();
-            }
-        });
-
-        ev.preventDefault();
-
-    });
-
-    $(".delete-consumer").on("click", function (ev) {
-
-        var url = [[@{/consumer/delete}]] ;
-        var consumerId = $(this).attr("data-consumer-id");
-
-        $.ajax({
-            type: "POST",
-            url: url,
-            data: "consumerId=" + consumerId, // serializes the form's elements.
-            success: function (data) {
-                location.reload();
-            }
-        });
-        ev.preventDefault();
-    });
-
-
     var speeds = [[${speeds}]];
 
     var producerRotations = {};
@@ -338,12 +217,178 @@
 
     var lastSpeedUpateTime = 0;
 
+    var partitionMaxSize = [[${topicMaxPartitionSizes}]];
+
+
+    var consumerMsgProcDurSlider;
+
+    $(function() {
+
+        consumerMsgProcDurSlider = $('#addConsumerModal .speed-slider').slider({
+            formater : function(value) {
+                return value + " μs";
+            }
+        });
+
+        $("#addConsumerModal").modal({show:false, backdrop:'static'});
+        $("#addProducerModal").modal({show:false, backdrop:'static'});
+        $("#addTopicModal").modal({show:false, backdrop:'static'});
+
+
+        $('.producer .speed-slider').slider().on('slide', function(ev){
+
+            var producerId = $(this).closest(".producer").attr("data-producer-id");
+            var speed = $(this).val();
+
+            var url = [[@{/producer/update-speed}]] ;
+            $.ajax({
+                type: "POST",
+                url: url,
+                data: "producerId=" + producerId + "&speedMsgPerSec=" + speed
+            });
+        });
+
+
+
+        $("#add-topic-form").submit(function (e) {
+
+            var url = $(this).attr("action");
+            $.ajax({
+                type: "POST",
+                url: url,
+                data: $("#add-topic-form").serialize(), // serializes the form's elements.
+                success: function (data) {
+                    location.reload();
+                }
+            });
+
+            e.preventDefault(); // avoid to execute the actual submit of the form.
+        });
+
+
+
+        $("#add-producer-form").submit(function (e) {
+
+            var url = $(this).attr("action");
+            $.ajax({
+                type: "POST",
+                url: url,
+                data: $(this).serialize(), // serializes the form's elements.
+                success: function (data) {
+                    location.reload();
+                }
+            });
+            e.preventDefault(); // avoid to execute the actual submit of the form.
+        });
+
+
+
+        $("#save-consumer-form").submit(function (e) {
+
+            var url = $(this).attr("action");
+
+            $.ajax({
+                type: "POST",
+                url: url,
+                data: $(this).serialize(), // serializes the form's elements.
+                success: function (data) {
+                    location.reload();
+                }
+            });
+
+            e.preventDefault(); // avoid to execute the actual submit of the form.
+        });
+
+        $(".delete-topic").on("click", function (ev) {
+
+            var url = [[@{/topic/delete}]];
+            var topicName = $(this).attr("data-topic-name");
+
+            $.ajax({
+                type: "POST",
+                url: url,
+                data: "topicName=" + topicName, // serializes the form's elements.
+                success: function (data) {
+                    location.reload();
+                }
+            });
+
+            ev.preventDefault();
+
+        });
+
+        $(".delete-producer").on("click", function (ev) {
+
+            var url = [[@{/producer/delete}]] ;
+            var producerId = $(this).closest("div").attr("data-producer-id");
+
+            $.ajax({
+                type: "POST",
+                url: url,
+                data: "producerId=" + producerId, // serializes the form's elements.
+                success: function (data) {
+                    location.reload();
+                }
+            });
+
+            ev.preventDefault();
+
+        });
+
+        $(".delete-consumer").on("click", function (ev) {
+
+            var url = [[@{/consumer/delete}]] ;
+            var consumerId = $(this).attr("data-consumer-id");
+
+            $.ajax({
+                type: "POST",
+                url: url,
+                data: "consumerId=" + consumerId, // serializes the form's elements.
+                success: function (data) {
+                    location.reload();
+                }
+            });
+            ev.preventDefault();
+        });
+
+    });
+
+
+
+
+    function showConsumerForm(consumerId){
+        $("#save-consumer-form input[name='consumerId']").val(consumerId);
+        if(consumerId > 0) {
+            var msgProcDur = parseInt($("#consumer-" + consumerId).attr("data-msg-proc-dur"));
+            consumerMsgProcDurSlider.slider('setValue', msgProcDur);
+            $("#addConsumerModal .modal-title").text("Update message processing duration");
+            $("#addConsumerModal .submit-btn").text("Update");
+            $(".consumer-group-input").hide();
+            $(".consumer-topic-input").hide();
+        }
+        else {
+            $("#addConsumerModal .modal-title").text("Create new consumer");
+            $("#addConsumerModal .submit-btn").text("Create");
+            consumerMsgProcDurSlider.slider('setValue', 0);
+            $(".consumer-group-input").show();
+            $(".consumer-topic-input").show();
+        }
+
+        $("#addConsumerModal").modal("show");
+        $("#addConsumerModal").modal("show");
+    }
+
+
+
+
     function getState() {
 
         var url = [[@{/state}]] ;
         $.ajax({
+
             type: "POST",
             url: url,
+
             success: function (data) {
                 speeds = data.speeds;
                 lastSpeedUpateTime = new Date().getTime();
@@ -352,9 +397,8 @@
                 updatePartitionSizes(data.partitionSizes, topicMaxPartitionSizes);
                 updateConsumerOffsets(data.consumerOffsets, topicMaxPartitionSizes);
             },
+
             error: function (xhr, ajaxOptions, thrownError) {
-//                alert(xhr.status);
-//                alert(thrownError);
                 for (var pId in speeds.producerSpeeds){
                     speeds.producerSpeeds[pId] = 0;
                 }
@@ -365,7 +409,7 @@
         });
     }
 
-    var partitionMaxSize = [[${partitionMaxSize}]];
+
 
     function getTopicMaxPartSizes(partitionSizeMap) {
         var topicMaxPartitionSizes = {};
@@ -423,7 +467,6 @@
                     }
                 }
 
-                // remove c
                 $("#" + partitionKey + " .consumer-offsets-holder").children('.consumer-offset').each(function(i) {
                     var oCId = parseInt($(this).find(".tooltip-inner").text().substring(1));
                     if(consumerOffsets[oCId] === undefined){

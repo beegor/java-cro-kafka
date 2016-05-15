@@ -26,6 +26,15 @@ public class ConsumersManagerImpl implements ConsumersManager {
     }
 
     @Override
+    public void updateConsumerMsgProcDuration(String consumerId, Long msgProcDur) {
+
+        JavaCroConsumer consumer = consumers.get(consumerId);
+        if (consumer != null) {
+            consumer.setMsgProcessDuration(msgProcDur);
+        }
+    }
+
+    @Override
     public void destroyConsumer(String consumerId) {
         JavaCroConsumer consumer = consumers.remove(consumerId);
         if (consumer != null) {

@@ -157,7 +157,7 @@ public class MainController {
             String partitionKey = entry.getKey();
             String topicKey = partitionKey.substring(0, partitionKey.lastIndexOf("_"));
             long pSize = (partitionSizes.get(partitionKey) / 1000000L  + 1L) * 1000000L;
-            if( !maxSizes.containsValue(topicKey) || maxSizes.get(topicKey) < pSize)
+            if( !maxSizes.containsKey(topicKey) || maxSizes.get(topicKey) < pSize)
                 maxSizes.put(topicKey, pSize);
         }
         return maxSizes;

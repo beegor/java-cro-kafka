@@ -23,18 +23,30 @@ public class ConsumersController {
 
 
     @ResponseBody
-    @RequestMapping("/add")
-    public String add(@RequestParam String topicName, @RequestParam String group, @RequestParam String msgProcDur) {
+    @RequestMapping("/save")
+    public String save(@RequestParam(required = false) Integer consumerId, @RequestParam String topicName, @RequestParam String group, @RequestParam String msgProcDur) {
         try {
+
             Topic topic = topicManager.getTopic(topicName);
+
             if (topic != null) {
+
                 Long msgHandleDur = stirngToLong(msgProcDur, 0L);
-                String consumerId = consumersManager.addConsumer(topic, group, msgHandleDur);
-                return "Consumer successfully added: " + consumerId;
+
+                if(consumerId != null && consumerId > 0) {
+                    consumersManager.updateConsumerMsgProcDuration(consumerId.toString(), msgHandleDur);
+                    return "Consumer successfully updated: " + consumerId;
+                }
+                else {
+                    consumersManager.addConsumer(topic, group, msgHandleDur);
+                    return "Consumer successfully added: " + consumerId;
+                }
+
             } else {
                 return "ERROR: No such topic: " + topicName;
             }
         } catch (Exception e) {
+            e.printStackTrace();
             return "ERROR: " + e.getMessage();
         }
     }

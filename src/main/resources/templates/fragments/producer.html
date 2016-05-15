@@ -4,6 +4,7 @@
 
 
 <!--/*@thymesVar id="producer" type="com.inova.javacro.kafka.core.JavaCroProducer"*/-->
+
     <div th:fragment="producer(producerId, producer)" th:id="'producer-' + ${producerId}" th:attr="data-producer-id=${producerId}" class="producer"  >
         <button class="btn btn-danger delete-producer pull-right" >X</button>
         <h2 th:text="|P ${producerId}|" th:style="|background-color: ${producer.topic.topicColorHex}|"></h2>
@@ -20,8 +21,6 @@
         </div>
 
     </div>
-
-
 
 </body>
 </html>
