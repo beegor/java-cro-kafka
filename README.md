@@ -18,6 +18,10 @@ It's a Spring Boot web application which demonstrates how to create topics, prod
 
 #Runing the demo
 
+##Starting Kafka
+
+##Staring demo app
+
 1. In terminal, navigate to the directory where you saved java-cro-kakfa-jar and run command :
     java -jar java-cro-kafka-jar
 
