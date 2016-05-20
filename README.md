@@ -20,7 +20,7 @@ It's a Spring Boot web application which demonstrates how to create topics, prod
 
 ##Starting Kafka
 
-1.Start Zookeeper - Open terminal and navigate to confluent home folder from step 1 of installation
+1. Start Zookeeper - Open terminal and navigate to confluent home folder from step 1 of installation
 run command "bin/zookeeper-server-start etc/kafka/zookeeper.properties"
 
 2. Start Kafka broker - Open another terminal, navigate to confluent home folder and run command: "bin/kafka-server-start etc/kafka/server.properties"
